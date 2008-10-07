@@ -1,0 +1,73 @@
+<?php
+// $Id$
+/**
+ * @file - shows a library patron's data.
+ *
+ */
+/**
+ * Implementation of hook_block
+ */
+function patroninfo_block($op='list', $delta=0, $edit=array()) {
+        global $user;
+        switch ($op) {
+                case 'list':
+                        $blocks[0]['info'] = t('PatronInfo');
+                        return $blocks;
+                case 'view':
+			$netid = cu_authenticate();
+//			$netid  = $_COOKIE["netid"];
+		        if (isset($netid) && $netid != '') { 	
+                        $blocks['subject'] = t('PatronInfo');
+			// es287 -- shows only chrged, and bd                           -- okay
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.$user->name;
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'jms1';
+   		        // es324 -- bd, and illiad only 			        -- okay.
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'es324';
+			// vac11 -- voyager, fines, holds, bd                            -- okay
+			// vac11 -- lots of everything. voyage, fines, holds, bd, illiad -- bad
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'vac11';
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'jtk1';
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/v.txt';
+                        $url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.$netid;
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'gw57';
+                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'odo3';
+                        $url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.$netid;
+			$stuff = file_get_contents($url);
+                        // the json decode gets all twisted up if the json is not utf-8, and if it contains tabs.
+                        $str = iconv("ISO-8859-1", "UTF-8", $stuff);
+			$str =  strtr( $str,"\t", " ");
+		        $var = json_decode($str); 
+                        foreach($var->items as $item) {
+			    if ($item->status == 'chrged' || $item->status == ' RECEIVED') { 
+			      if ($item->od == $item->rd) { $due = 'Charged:due on '.$item->od;} else { 'Renewed:due on '.$item->rd;};
+                              $cdata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  ' at '. $item ->lo. '</li>';
+		            }
+			    if ($item->status == ' SHIPPED' || $item->status == 'pahr') { 
+                              $odata.= '<li class=patroninfo-item>'.$item->tl.'is on its way to you from : '.
+                              $item ->lo. '</li>';
+		            }
+			    if ($item->status == 'waiting') { 
+                              $wdata.= '<li class=patroninfo-item>'.$item ->tl.'is waiting for you : '. $item ->lo. '</li>';
+		            }
+			    if ($item->status == 'finef') { 
+                              $fdata.= '<li class=patroninfo-item>'.$item ->tl.'was due:'. $item ->od.' at '. $item ->lo. 
+                                                'Amount:' .$item->am .'</li>';
+		            }
+                          }  
+			  $you = $var->patron->last.','.$var->patron->given;
+                          $blocks['content'] = "<h2>Patron info for $you</h2>";
+//                          $blocks['content'] .= '<h2>Items charged</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$cdata.'</ol>'.$stuff . '<br/>'.$url. '</div>';
+                          $blocks['content'] .= '<h2>Items charged</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$cdata.'</ol></div>';
+                          $blocks['content'] .= '<h2>Waiting for you</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$wdata.'</ol></div>';
+                          $blocks['content'] .= '<h2>On the way to you</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$odata.'</ol></div>';
+                          $blocks['content'] .= '<h2>Fines and charges</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$fdata.'</ol></div>';
+                          return $blocks;
+			} else {
+			$dest = 'http://dss-es287linux.library.cornell.edu/apache2-default/test/netid.php';
+			setcookie ("callback", "/apache2-default/webvision/xaboutme");
+			drupal_goto($dest);
+			}
+        }
+}
+
+ 
