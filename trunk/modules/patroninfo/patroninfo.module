@@ -7,6 +7,7 @@
 /**
  * Implementation of hook_block
  */
+define('DEFAULT_API','http://wwwdev.library.cornell.edu/cgi-bin/ilsapi2.cgi?netid=');
 function patroninfo_block($op='list', $delta=0, $edit=array()) {
         global $user;
         switch ($op) {
@@ -15,54 +16,99 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                         return $blocks;
                 case 'view':
 			$netid = cu_authenticate();
-//			$netid  = $_COOKIE["netid"];
 		        if (isset($netid) && $netid != '') { 	
                         $blocks['subject'] = t('PatronInfo');
-			// es287 -- shows only chrged, and bd                           -- okay
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.$user->name;
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'jms1';
-   		        // es324 -- bd, and illiad only 			        -- okay.
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'es324';
-			// vac11 -- voyager, fines, holds, bd                            -- okay
-			// vac11 -- lots of everything. voyage, fines, holds, bd, illiad -- bad
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'vac11';
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'jtk1';
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/v.txt';
-                        $url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.$netid;
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'gw57';
-                        //$url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.'odo3';
-                        $url = 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='.$netid;
+                        $url=variable_get('patroninfo_target', DEFAULT_API).$netid;
+		        // someone might set the api address to null.
+		        if (strlen($url)<7) { $url = DEFAULT_API.$netid; } 
 			$stuff = file_get_contents($url);
                         // the json decode gets all twisted up if the json is not utf-8, and if it contains tabs.
+		        // at the moment some of the data is utf-8, and some iso-8859-1. got to fix this.
                         $str = iconv("ISO-8859-1", "UTF-8", $stuff);
 			$str =  strtr( $str,"\t", " ");
 		        $var = json_decode($str); 
                         foreach($var->items as $item) {
 			    if ($item->status == 'chrged' || $item->status == ' RECEIVED') { 
-			      if ($item->od == $item->rd) { $due = 'Charged:due on '.$item->od;} else { 'Renewed:due on '.$item->rd;};
-                              $cdata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  ' at '. $item ->lo. '</li>';
+			      if ($item->od == $item->rd) { $due = $item->od;} else { $due=$item->rd;};
+                              $cdatad[]= array($due,$item->tl,$item->lo);
+                              $cdata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  t(' borrowed from '). $item ->lo. '</li>';
 		            }
 			    if ($item->status == ' SHIPPED' || $item->status == 'pahr') { 
-                              $odata.= '<li class=patroninfo-item>'.$item->tl.'is on its way to you from : '.
+			      $shipped = $item->ed; 
+                              $odatad[]= array($shipped,$item->tl,$item->lo);
+                              $odata.= '<li class=patroninfo-item>'.$item->tl.t('is on its way to you for pickup at : ').
                               $item ->lo. '</li>';
 		            }
 			    if ($item->status == 'waiting') { 
-                              $wdata.= '<li class=patroninfo-item>'.$item ->tl.'is waiting for you : '. $item ->lo. '</li>';
+                              if (isset($item->url) && $item->url != '') { 
+                                $at = _link(t('Get It!'),'patroninfo-link', $item->url);
+                              } else {
+                                $at = $item->lo;
+                              }
+			      $before = $item->ed; 
+                              $wdatad[]= array($before,$item->tl,$at);
+                              $wdata.= '<li class=patroninfo-item>'.$item ->tl.t('is waiting for you : '). $item ->lo. '</li>';
 		            }
 			    if ($item->status == 'finef') { 
-                              $fdata.= '<li class=patroninfo-item>'.$item ->tl.'was due:'. $item ->od.' at '. $item ->lo. 
-                                                'Amount:' .$item->am .'</li>';
+			      $am = substr($item->am,0,strlen-2).'.'.substr($item->am,-2); 
+                              $fdatad[]= array($item->ed,$item->tl,$am);
+                              $fdata.= '<li class=patroninfo-item>'.$item ->tl.t('was due:'). $item ->od.t(' at '). $item ->lo. 
+                                                t('Amount:') .$item->am .'</li>';
 		            }
                           }  
 			  $you = $var->patron->last.','.$var->patron->given;
-                          $blocks['content'] = "<h2>Patron info for $you</h2>";
-//                          $blocks['content'] .= '<h2>Items charged</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$cdata.'</ol>'.$stuff . '<br/>'.$url. '</div>';
-                          $blocks['content'] .= '<h2>Items charged</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$cdata.'</ol></div>';
-                          $blocks['content'] .= '<h2>Waiting for you</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$wdata.'</ol></div>';
-                          $blocks['content'] .= '<h2>On the way to you</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$odata.'</ol></div>';
-                          $blocks['content'] .= '<h2>Fines and charges</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$fdata.'</ol></div>';
+                          $blocks['content'] = "<h2>".t('Patron info for')." $you</h2>";
+		          if (0) {
+                          $blocks['content'] .= '<h2>'.t('Available now').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$wdata.'</ol></div>';
+                          $blocks['content'] .= '<h2>'.t('In process').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$odata.'</ol></div>';
+                          if (variable_get('patroninfo_debug',0)) {
+                            $blocks['content'] .= '<h2>'.t('Checked out').'</h2><div class=patroninfo><ol class=patroninfo-list><br/>'.$cdata.'</ol>'.$stuff.'<br/>'.$url.'</div>';
+                          } else {
+                           $blocks['content'] .= '<h2>'.t('Checked out').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$cdata.'</ol></div>';
+                          }
+                          $blocks['content'] .= '<h2>'.t('Fines and charges').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$fdata.'</ol></div>';
+			  } else {
+                                 if (0) {
+                                   $fstitle = t('Checked out').'( ' .sizeof($cdatad).')';
+                                   $bc = theme_table(array(t('Return before'), 
+                                           t('Description'), t('Renew (not yet functional)')),
+                                           $cdatad, null,t('Checked out'));
+                                   $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => TRUE, '#value' => $bc);
+                                   $blocks['content'] .=  theme('fieldset', $fieldset);
+                                 $fstitle = t('Available now').' (' .sizeof($wdatad).')';
+                                 $bc = theme_table(array(t('Pickup before'),t('Description'),t('From')),$wdatad,
+                                                            null,t('Available now'));
+                                 $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => 
+                                                   sizeof($wdatad)?FALSE:TRUE, '#value' => $bc);
+                                 $blocks['content'] .=  theme('fieldset', $fieldset);
+                                 $fstitle = t('In Process').' (' .sizeof($odatad).')'; 
+                                 $bc = theme_table(array(t('Request expires'),t('Description'),t('For pickup at')),$odatad,
+                                                            null,t('In process'));
+                                 $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => TRUE, '#value' => $bc);
+                                 $blocks['content'] .=  theme('fieldset', $fieldset);
+                                 $fstitle = t('Fines and Fees').' (' .sizeof($fdatad).')'; 
+                                 $bc = theme_table(array(t('Process before'),t('Description'),t('Amount')),$fdatad,
+                                                            null,t('Fines and Fees'));
+                                 $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => TRUE, '#value' => $bc);
+                                 $blocks['content'] .=  theme('fieldset', $fieldset);
+                                 }
+                                 $blocks['content'] .=  _format_table(t('Checked out'),$cdatad, t('Due on'),
+                                                                      t('Description'), t('Renew (not yet functional)'));
+                                 $blocks['content'] .=  _format_table(t('Available now'),$wdatad, t('Pickup before'),
+                                                                      t('Description'), t('At'),sizeof($wdatad)?FALSE:TRUE);
+                                 $blocks['content'] .=  _format_table(t('In process'),$odatad, t('Pickup before'),
+                                                                      t('Description'), t('At'));
+                                 $blocks['content'] .=  _format_table(t('Fines and fees'),$fdatad, t('Incurred on'),
+                                                                      t('Description'), t('Amt'));
+
+
+
+                                 if (variable_get('patroninfo_debug',0)) {
+                                   $blocks['content'] .= "URL:$url<br/>$stuff<br/>"; 
+                                 }
+                          }
                           return $blocks;
-			} else {
+			} else { // we should never reach this point.  if we do, reality is no longer in existence. 
 			$dest = 'http://dss-es287linux.library.cornell.edu/apache2-default/test/netid.php';
 			setcookie ("callback", "/apache2-default/webvision/xaboutme");
 			drupal_goto($dest);
@@ -70,4 +116,75 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
         }
 }
 
- 
+/**
+ * Implementation of hook_menu().
+ */
+function patroninfo_menu() {
+  $items = array ();
+  $items['admin/settings/patroninfo'] = array (
+      'title' => t('ILS api client'),
+      'description' => t('Configure settings for ils api.'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('patroninfo_admin_settings'),
+      'access arguments' => array('configure ils api feeds'),
+      'type' => MENU_NORMAL_ITEM);
+ return $items;
+} 
+
+function patroninfo_admin_settings() {
+  $form['patroninfo_template'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Patron Info template'),
+    '#default_value' => variable_get('patroninfo_target', 'http://libdev.library.cornell.edu/~es287/classes/ilsapi.cgi?netid='),
+    '#description' => t('URL of the target cgi that returns ils info. The user netid is added at the end. netid is the parm.'),
+    '#maxlength' => 256,
+  );
+  $form['patroninfo_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show debug info'),
+    '#default_value' => variable_get('patroninfo_debug', 0),
+    '#description' => t('Show debug info'),
+  );
+  $form['#submit'] = array('patroninfo_admin_settings_submit');
+
+  return system_settings_form($form);
+}
+
+function patroninfo_perm() {
+  return array('configure ils api feeds');
+}
+
+/**
+ * Validation function;
+ *
+ */
+function patroninfo_admin_settings_validate(&$form, $form_state) {
+}
+
+/**
+ * Submits the admin settings form and saves all the variables.
+ */
+function patroninfo_admin_settings_submit($form, &$form_state) {
+  variable_set('patroninfo_target', $form_state['values']['patroninfo_template']);
+  variable_set('patroninfo_debug', $form_state['values']['patroninfo_debug']);
+}
+
+/**
+ * returns a formatted link 
+ */
+function _link($label,$class, $link) {
+ $uclass = ' class="'.(isset($class) ? $class : 'link') . '" '; 
+ return "<a$uclass href='$link'>$label</a>" ;
+}
+
+/**
+ * returns a formatted link 
+ */
+function _format_table($legend,$datad, $col_one,$col_two,$col_three,$clapsed = TRUE) {
+   $fstitle = $legend.' (' .sizeof($datad).')';
+   $bc = theme_table(array($col_one, $col_two, 
+                     $col_three),$datad, null,$legend);
+   $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => $clapsed, '#value' => $bc);
+   return  theme('fieldset', $fieldset);
+}
+
