@@ -13,8 +13,13 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
         switch ($op) {
                 case 'list':
                         $blocks[0]['info'] = t('PatronInfo');
+		        $blocks[0]['cache'] = BLOCK_NO_CACHE;
                         return $blocks;
                 case 'view':
+			views_include("tabs");
+			views_add_css('admin');
+                        _patroninfo_add_local(); 
+                        $ts  = new views_tabset; 
 			$netid = cu_authenticate();
 		        if (isset($netid) && $netid != '') { 	
                         $blocks['subject'] = t('PatronInfo');
@@ -27,11 +32,27 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                         $str = iconv("ISO-8859-1", "UTF-8", $stuff);
 			$str =  strtr( $str,"\t", " ");
 		        $var = json_decode($str); 
+			$cindex = 0;
                         foreach($var->items as $item) {
-			    if ($item->status == 'chrged' || $item->status == ' RECEIVED') { 
-			      if ($item->od == $item->rd) { $due = $item->od;} else { $due=$item->rd;};
-                              $cdatad[]= array($due,$item->tl,$item->lo);
+                            $note = '';
+			    if (($item->status == 'chrged') || 
+                             ($item->status == ' RECEIVED') 
+                             ) { 
+			      if ($item->od == $item->rd) { $due = $item->od;} else { $due=$item->rd;}
+                              if (strlen($item->re) > 0) { $note = "Recalled. Please note due date."; $due = $item->re;}
+                              if (!empty($item->vstatus)) { $note .= ' ' .$item->vstatus;}
+                              $cdatad[]= array($due,$item->tl . t('Location:').$item->lo." $note",'');
+                              $scdatad[] = array(index => $cindex++,  due => $due); 
                               $cdata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  t(' borrowed from '). $item ->lo. '</li>';
+		            }
+			    if ( ($item->status == 'Unfilled') || 
+                             ($item->status == 'Cancelled')) { 
+			      if ($item->od == $item->rd) { $due = $item->od;} else { $due=$item->rd;}
+                              if (strlen($item->re) > 0) { $note = "Recalled. Please note due date."; $due = $item->re;}
+                              if (!empty($item->vstatus)) { $note .= ' ' .$item->vstatus;}
+                              $ndatad[]= array($due,$item->tl . t('Location:').$item->lo." $note",'');
+                              $ncdatad[] = array(index => $nindex++,  due => $due); 
+                              $ndata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  t(' borrowed from '). $item ->lo. '</li>';
 		            }
 			    if ($item->status == ' SHIPPED' || $item->status == 'pahr') { 
 			      $shipped = $item->ed; 
@@ -56,56 +77,26 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                                                 t('Amount:') .$item->am .'</li>';
 		            }
                           }  
+                          if($cindex) { // only sort if there is something there. 
+                              foreach ($scdatad as $key => $row) { $dates[$key]  = $row['due']; }
+                             // Sort the data with dates ascending
+                             // Add $scdatad as the last parameter, to sort by the common key
+                             array_multisort($dates, SORT_ASC, $scdatad);
+                             foreach ($scdatad as $key => $row) {
+                               $cdatadx[$row['index']]  = $cdatad[$row['index']];
+                             }
+                             $cdatad = $cdatadx;
+                           }
 			  $you = $var->patron->last.','.$var->patron->given;
                           $blocks['content'] = "<h2>".t('Patron info for')." $you</h2>";
-		          if (0) {
-                          $blocks['content'] .= '<h2>'.t('Available now').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$wdata.'</ol></div>';
-                          $blocks['content'] .= '<h2>'.t('In process').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$odata.'</ol></div>';
+			  $p1=array($cdatad,array(t('Due on'),t('Description'),t('Renew(not functional)')),t('Checked out'));
+			  $p2 = array($wdatad,array(t('Pickup before'),t('Description'), t('At')),t('Available'));
+			  $p3 = array($odatad,array(t('Pickup before'),t('Description'), t('At')),t('In Process'));
+			  $p4 = array($fdatad,array(t('Incurred on'),t('Description'), t('Amt')),t('Fines and fees'));
+			  $p5 = array($ndatad,array(t('Date'),t('Item and Message'), t('At')),t('Notices'));
+		          $blocks['content'] .=   _patroninfo_tabs(array($p1,$p2,$p3,$p4,$p5));
                           if (variable_get('patroninfo_debug',0)) {
-                            $blocks['content'] .= '<h2>'.t('Checked out').'</h2><div class=patroninfo><ol class=patroninfo-list><br/>'.$cdata.'</ol>'.$stuff.'<br/>'.$url.'</div>';
-                          } else {
-                           $blocks['content'] .= '<h2>'.t('Checked out').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$cdata.'</ol></div>';
-                          }
-                          $blocks['content'] .= '<h2>'.t('Fines and charges').'</h2><div class=patroninfo><ol class=patroninfo-list>'.'<br/>'.$fdata.'</ol></div>';
-			  } else {
-                                 if (0) {
-                                   $fstitle = t('Checked out').'( ' .sizeof($cdatad).')';
-                                   $bc = theme_table(array(t('Return before'), 
-                                           t('Description'), t('Renew (not yet functional)')),
-                                           $cdatad, null,t('Checked out'));
-                                   $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => TRUE, '#value' => $bc);
-                                   $blocks['content'] .=  theme('fieldset', $fieldset);
-                                 $fstitle = t('Available now').' (' .sizeof($wdatad).')';
-                                 $bc = theme_table(array(t('Pickup before'),t('Description'),t('From')),$wdatad,
-                                                            null,t('Available now'));
-                                 $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => 
-                                                   sizeof($wdatad)?FALSE:TRUE, '#value' => $bc);
-                                 $blocks['content'] .=  theme('fieldset', $fieldset);
-                                 $fstitle = t('In Process').' (' .sizeof($odatad).')'; 
-                                 $bc = theme_table(array(t('Request expires'),t('Description'),t('For pickup at')),$odatad,
-                                                            null,t('In process'));
-                                 $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => TRUE, '#value' => $bc);
-                                 $blocks['content'] .=  theme('fieldset', $fieldset);
-                                 $fstitle = t('Fines and Fees').' (' .sizeof($fdatad).')'; 
-                                 $bc = theme_table(array(t('Process before'),t('Description'),t('Amount')),$fdatad,
-                                                            null,t('Fines and Fees'));
-                                 $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => TRUE, '#value' => $bc);
-                                 $blocks['content'] .=  theme('fieldset', $fieldset);
-                                 }
-                                 $blocks['content'] .=  _format_table(t('Checked out'),$cdatad, t('Due on'),
-                                                                      t('Description'), t('Renew (not yet functional)'));
-                                 $blocks['content'] .=  _format_table(t('Available now'),$wdatad, t('Pickup before'),
-                                                                      t('Description'), t('At'),sizeof($wdatad)?FALSE:TRUE);
-                                 $blocks['content'] .=  _format_table(t('In process'),$odatad, t('Pickup before'),
-                                                                      t('Description'), t('At'));
-                                 $blocks['content'] .=  _format_table(t('Fines and fees'),$fdatad, t('Incurred on'),
-                                                                      t('Description'), t('Amt'));
-
-
-
-                                 if (variable_get('patroninfo_debug',0)) {
-                                   $blocks['content'] .= "URL:$url<br/>$stuff<br/>"; 
-                                 }
+                               $blocks['content'] .= "URL:$url<br/>$stuff<br/>"; 
                           }
                           return $blocks;
 			} else { // we should never reach this point.  if we do, reality is no longer in existence. 
@@ -185,6 +176,37 @@ function _format_table($legend,$datad, $col_one,$col_two,$col_three,$clapsed = T
    $bc = theme_table(array($col_one, $col_two, 
                      $col_three),$datad, null,$legend);
    $fieldset = array('#title' => $fstitle, '#collapsible' => TRUE,'#collapsed' => $clapsed, '#value' => $bc);
-   return  theme('fieldset', $fieldset);
+   //$fieldset = array('#title' => $fstitle, '#collapsible' => FALSE,'#collapsed' => $clapsed, '#value' => $bc);
+   return  theme('fieldset', $fieldset) ;
+}
+/**
+ * returns tabs formatted like primary tabs. 
+ * ptabs is an array of arrays -- each element is an array of data, and an array of labels.
+ * first is array of data, second is array of items, third is just label. eg 
+ *    array($wdatad,array(t('Pickup before'),t('Description'), t('At')),t('Available'));
+ */
+function _patroninfo_tabs($ptabs) {
+  $ul = '<div id="pi-tabs" class="xtabs"><ul>' . "\n";
+  $tabn = 0;
+  foreach($ptabs as $item) {
+    $bc = theme_table($item[1],$item[0], null,$item[2]);
+    $ul .= "<li><a href=\"#frag-$tabn\"><span>".$item[2] . '(' . sizeof($item[0]) .')</span></a></li>' . "\n"; 
+    $dv .= "<div id=\"frag-$tabn\">".$bc.'</div>' . "\n"; 
+    $tabn++;
+  }
+  $ul .= '</ul>';
+  $output .= $ul.$dv . '</div>' . "\n";
+  return $output;
 }
 
+/**
+ * add js, both standard files, and inline boilerplate for patroninfo module.
+ */
+function _patroninfo_add_local() {
+   drupal_add_js(drupal_get_path('module', 'patroninfo') .'/js/patroninfo-ui.core.js');
+   drupal_add_js(drupal_get_path('module', 'patroninfo') .'/js/patroninfo-ui.tabs.js');
+   //drupal_add_js(drupal_get_path('module', 'patroninfo') .'/js/patroninfo-divheader.js');
+   drupal_add_css(drupal_get_path('module', 'patroninfo') .'/css/patroninfo-flora.pi.css');
+   $boiler = '$(document).ready(function(){ $("#pi-tabs > ul").tabs(); });';
+   drupal_add_js($boiler,'inline');
+}
