@@ -36,12 +36,13 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                         foreach($var->items as $item) {
                             $note = '';
 			    if (($item->status == 'chrged') || 
-                             ($item->status == ' RECEIVED') 
+                             ($item->status == ' RECEIVED')  ||
+                             ($item->status == 'Received') 
                              ) { 
 			      if ($item->od == $item->rd) { $due = $item->od;} else { $due=$item->rd;}
                               if (strlen($item->re) > 0) { $note = "Recalled. Please note due date."; $due = $item->re;}
                               if (!empty($item->vstatus)) { $note .= ' ' .$item->vstatus;}
-                              $cdatad[]= array($due,$item->tl . t('Location:').$item->lo." $note",'');
+                              $cdatad[]= array($due,$item->tl . t('Location:').$item->lo.". $note",'');
                               $scdatad[] = array(index => $cindex++,  due => $due); 
                               $cdata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  t(' borrowed from '). $item ->lo. '</li>';
 		            }
