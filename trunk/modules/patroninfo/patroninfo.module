@@ -89,8 +89,10 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                              $cdatad = $cdatadx;
                            }
 			  $you = $var->patron->last.','.$var->patron->given;
-                          $blocks['content'] = "<h2>".t('Patron info for')." $you</h2>";
-			  $p1=array($cdatad,array(t('Due on'),t('Description'),t('Renew(not functional)')),t('Checked out'));
+                          $blocks['content'] = "<h3 id='patroninfoid' class='patroninfo-title'>".t('Patron info for')." $you</h3>";
+			  // put this back in WHEN RENEW DOES SOMETHING.
+			  //$p1=array($cdatad,array(t('Due on'),t('Description'),t('Renew(not functional)')),t('Checked out'));
+			  $p1=array($cdatad,array(t('Due on'),t('Description'),t(' ')),t('Checked out'));
 			  $p2 = array($wdatad,array(t('Pickup before'),t('Description'), t('At')),t('Available'));
 			  $p3 = array($odatad,array(t('Pickup before'),t('Description'), t('At')),t('In Process'));
 			  $p4 = array($fdatad,array(t('Incurred on'),t('Description'), t('Amt')),t('Fines and fees'));
