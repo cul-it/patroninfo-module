@@ -1,5 +1,5 @@
 ; $Id$
 name = PatronInfo
-description = show information about a patron : $Id$ 
+description = show information about a patron
 core = 6.x
 php = 5.2
