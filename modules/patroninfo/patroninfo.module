@@ -33,6 +33,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			$str =  strtr( $str,"\t", " ");
 		        $var = json_decode($str); 
 			$cindex = 0;
+			$today =  date('Y-m-d');
                         foreach($var->items as $item) {
                             $note = '';
 			    if (($item->status == 'chrged') || 
@@ -42,6 +43,12 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			      if ($item->od == $item->rd) { $due = $item->od;} else { $due=$item->rd;}
                               if (strlen($item->re) > 0) { $note = "Recalled. Please note due date."; $due = $item->re;}
                               if (!empty($item->vstatus)) { $note .= ' ' .$item->vstatus;}
+                              if ($due == $today) { 
+				// the space makes the string sort to the top -- so leave it there.
+                                // the span is for anyone who wants to style things due today.	
+                                if(!empty($item->odt)) $time = ' by ' . $item->odt  ;
+                                $due = ' <span class="patroninfo-today">*' . $due . $time . '</span>.';
+                              } 
                               $cdatad[]= array($due,$item->tl . t('Location:').$item->lo.". $note",'');
                               $scdatad[] = array(index => $cindex++,  due => $due); 
                               $cdata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  t(' borrowed from '). $item ->lo. '</li>';
