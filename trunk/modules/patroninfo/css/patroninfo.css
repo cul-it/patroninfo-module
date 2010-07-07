@@ -42,4 +42,7 @@ div.sticky-header {
 #renewform #frag-3, 
 #renewform #frag-4 {height:auto; border:5px solid #bbb; width:740px;}
 
-#pi-tabs ul.ui-tabs-nav a:hover {border-bottom:none; background:#aaa; background-image:none;}
+#pi-tabs ul.ui-tabs-nav a:hover,
+#pi-tabs ul.ui-tabs-nav a span:hover {border-bottom:none; background:#bbb; background-image:none;}
+
+#pi-tabs tr.even {background:transparent;}
