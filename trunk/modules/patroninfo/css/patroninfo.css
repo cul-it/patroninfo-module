@@ -32,8 +32,16 @@ div.sticky-header {
   margin-top: 0;
   background: #fff;
 }
-#frag-0,#frag-1,#frag-2,#frag-3,#frag-4 { 
-    overflow:scroll ;
-    width:740px;
-    height:400px;
-}
+
+
+#myacctbox {padding:8px; background:#bb; clear:both;}
+
+#renewform {}
+
+#renewform #frag-0,
+#renewform  #frag-1, 
+#renewform #frag-2, 
+#renewform #frag-3, 
+#renewform #frag-4 {height:auto; border:5px solid #bbb; width:740px;}
+
+#pi-tabs ul.ui-tabs-nav a:hover {border-bottom:none; background:#aaa; background-image:none;}
