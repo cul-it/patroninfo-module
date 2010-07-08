@@ -43,10 +43,11 @@ div.sticky-header {
 
 #pi-tabs ul.ui-tabs-nav li {list-style:none;background:none;}
 
-#pi-tabs ul.ui-tabs-nav a {border:none; background:none;} 
-#pi-tabs ul.ui-tabs-nav a span {display:block; padding:1px 4px;} 
+#pi-tabs ul.ui-tabs-nav a {border:none; background:none; padding:0;} 
+#pi-tabs ul.ui-tabs-nav a span {display:block; padding:3px 8px;} 
+#pi-tabs ul.ui-tabs-nav li.ui-tabs-selected a span {background:#bbb;}
 
-
+#pi-tabs ul.ui-tabs-nav a {background:#ddd;}
 #pi-tabs ul.ui-tabs-nav a:hover,
 #pi-tabs ul.ui-tabs-nav a span:hover {border-bottom:none; background:#bbb; background-image:none;}
 
