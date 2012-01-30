@@ -1,12 +1,16 @@
 Drupal.behaviors.patroninfoBehavior = function (context) {
+   function timeMsg() {
+	var t=setTimeout("var h=location.hostname; window.location='http://'+h+'/myacct';",10*60*1000);
+  }
+  //timeMsg();
   $(".cite").click(function(event) {
-     alert($(this));
-     alert(event);
-     alert(event.target.nodeName);
+     //alert($(this));
+     //alert(event);
+     //alert(event.target.nodeName);
      hr = event.target.parentNode.childNodes[1].href;
-     alert(hr);
+     //alert(hr);
      ti = event.target.parentNode.nextSibling.nextSibling.firstChild.nodeValue;
-     alert(ti);
+     //alert(ti);
      $("#patroninfo-export-box").corner();
      _pi_refbox(hr,ti);
    });
@@ -14,7 +18,7 @@ Drupal.behaviors.patroninfoBehavior = function (context) {
     $("#patroninfo-export-box").hide();
     return true;
    });
-   $("#cbotton").click(function(event){
+  $("#cbotton").click(function(event){
     d = $("#renewform").attr("action"); 
     $("#renewform").attr("target","refworks"); 
     $("#renewform").attr("action",d.replace(/renew/,"multiplec")); 
