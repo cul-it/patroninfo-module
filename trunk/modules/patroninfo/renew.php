@@ -1,15 +1,19 @@
 <?php
 $data = '';
 $dest='http://www.refworks.com/express/ExpressImport.asp?vendor=cornell.edu&filter=RefWorks%20Tagged%20Format&encoding=65001';
+$renewsessionname = $_COOKIE['renewsession'];
 $renewsession = $_COOKIE[$_COOKIE['renewsession']];
 $cdir = getcwd();
 //$boodir = '/var/www/html';
 //$boodir = '/var/www/apache2-default/webvision';
-$boodir = '/webvision-dev/apache2/htdocs/webvision';
-$boodir = '/library_www/beta/htdocs';
+   $boodir = '/libweb/sites/www.library.cornell.edu/htdocs';
+if (is_dir( '/libweb/sites/wwwdev.library.cornell.edu/htdocs')) {
+   $boodir = '/libweb/sites/wwwdev.library.cornell.edu/htdocs';
+}
 chdir($boodir);
 set_include_path(get_include_path() . PATH_SEPARATOR . $boodir);
 include_once("./includes/bootstrap.inc");
+session_name($renewsessionname);
 drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
 chdir($cdir);
 $sess = sess_read($renewsession); 
@@ -40,7 +44,10 @@ $bc = $_POST['bc'];
 $inid = $_POST['inid'];
 $netid = $_POST['netid'];
 
-
+$_SESSION['renew_user'] = $_POST['netid'];
+$handle = fopen("/tmp/".$renewsessionname.".txt", "w+");
+fwrite($handle,$netid);
+fclose($handle);
 $auths = array('illiad' => array($netid,$netid,$netid), 'voyager' => array($bc,$sn,$inid));
 
 $errors = '';
@@ -123,12 +130,14 @@ foreach ($canceled as $sysa => $ids) {
 
 
 if ($errors) {
-   setcookie('pimessage', $errors, 0, '/', '.cornell.edu');
+   setcookie('pimessage', $errors, 0, '/', $_SERVER['SERVER_NAME']);
    //setcookie("pimessage", $errors);
  //header("Location: ". $_SERVER['HTTP_REFERER']);
  //exit(0);
 }
-
+ //setcookie('pimessage', "No errors", 0, '/', '.cornell.edu');
+ //setcookie($renewsessionname, $renewsession, 0, '/', '.cornell.edu');
+ setcookie('renewuser', $netid, 0, '/', $_SERVER['SERVER_NAME']);
  header("Location: ". $_SERVER['HTTP_REFERER']);
  exit(0);
 

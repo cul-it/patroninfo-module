@@ -3,7 +3,10 @@
   $dest='http://www.refworks.com/express/ExpressImport.asp?vendor=cornell.edu&filter=RefWorks%20Tagged%20Format&encoding=65001';
   $renewsession = $_COOKIE[$_COOKIE['renewsession']];
   $cdir = getcwd();
-  $boodir = '/var/www/apache2-default/webvision';
+  $boodir = '/libweb/sites/www.library.cornell.edu/htdocs';
+  if (is_dir( '/libweb/sites/wwwdev.library.cornell.edu/htdocs')) {
+   $boodir = '/libweb/sites/wwwdev.library.cornell.edu/htdocs';
+  }
   chdir($boodir);
   set_include_path(get_include_path() . PATH_SEPARATOR . $boodir);
   include_once("./includes/bootstrap.inc");

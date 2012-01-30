@@ -31,13 +31,28 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                         _patroninfo_add_local(); 
                         $ts  = new views_tabset; 
 			$netid = cu_authenticate();
-                        //if ($netid == 'es287'){$netid = 'mv46';}
+			$actualnetid = $netid;
+			$netid = str_replace('@CORNELL.EDU','',$netid);
+                        //if ($netid == 'es287'){$netid = 'gid-manlyc@CORNELL.EDU';}
                         //if ($netid == 'es287'){$netid = 'aa34';}
                         //if ($netid == 'es287'){$netid = 'aa239';}
                         //if ($netid == 'es287'){$netid = 'ren5';}
 			if (user_access(OTHER_USER)) {
-                          if (isset($form_state['values']['other_user'])) 
-                            $netid = $form_state['values']['other_user'];
+                          $renewsessionname = $_COOKIE['renewsession']; 
+		          if (is_file("/tmp/".$renewsessionname.".txt")) {
+                            $netid=file_get_contents("/tmp/".$renewsessionname.".txt");
+                            unlink("/tmp/".$renewsessionname.".txt");
+                          }
+                          if (isset($_POST['other_user'])) 
+                            $netid = $_POST['other_user'];
+                          if (isset($_SESSION['renew_user'])) { 
+                            $netid = $_SESSION['renew_user'];
+                            $renew_user = $_SESSION['renew_user'];
+                          }
+                          if (0 && isset($_COOKIE['renewuser'])) { 
+                            $netid = $_COOKIE['renewuser'];
+			    drupal_set_header(__erase_cookie_header('renewuser'));
+                          }
                         }  
 		        if (isset($netid) && $netid != '') { 	
                           $blocks['subject'] = t('PatronInfo');
@@ -48,7 +63,8 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                           // the json decode gets all twisted up if the json is not utf-8, 
                           // and if it contains tabs.
 		          // at the moment some of the data is utf-8, and some iso-8859-1. got to fix this.
-                          $str = iconv("ISO-8859-1", "UTF-8", $stuff);
+                          //$str = iconv("ISO-8859-1", "UTF-8", $stuff);
+                          $str = $stuff; 
 			  $str =  strtr( $str,"\t", " ");
 		          $var = json_decode($str); 
 		          $patroninfo_data = $var; 
@@ -117,6 +133,13 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    '#type'  => 'hidden',
 			    '#value'  => $netid,
 			   );
+ 			   $form['submit'] = array(
+			    '#id'  => 'cbottonc',
+			    '#name'  => 'cbottonc',
+			    '#type'  => 'submit',
+			    '#value'  => t('Renew marked items'),
+			    '#button_type'  => 'button',
+			    );
  			   $form['cbott'] = array(
 			    '#id'  => 'cbotton',
 			    '#name'  => 'cbotton',
@@ -131,10 +154,6 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    '#button_type'  => 'button',
 			    '#value'  => t('Export All items'),
 			    );
- 			   $form['submit'] = array(
-			    '#type'  => 'submit',
-			    '#value'  => t('Renew or cancel marked items'),
-			    );
 			  if (user_access(OTHER_USER)) {
  			   $form['cbottb'] = array(
 			    '#id'  => 'cbottonb',
@@ -142,6 +161,13 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    '#type'  => 'button',
 			    '#button_type'  => 'button',
 			    '#value'  => t('Lookup info for specified user.'),
+			    );
+ 			   $form['cbottd'] = array(
+			    '#id'  => 'cbottond',
+			    '#name'  => 'cbottond',
+			    '#type'  => 'button',
+			    '#button_type'  => 'button',
+			    '#value'  => t('Reset current user to me.'),
 			    );
                            }
 			   $disabled = 1;
@@ -265,10 +291,10 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                           if ($var->patron->status != 'Active' ) { $you .= '. <i>Note</i>: &nbsp; your account has expired; please <a href="mailto:libpublicservices@cornell.edu">contact the library</a> for assistance.' ; $disabled = 1;}
 			  $ecount =  count($pima) > 0 ? count($pima)-1 . " errors": "" ;
                           $blocks['content'] = "<h3 id='patroninfoid' class='patroninfo-title'>".t('Account information for')." $you // $ecount </h3>";
-			  $p1 = array($cdatad,array(t('Renew'),t('Due date'),t('Description'),t(' ')),t('Checked out'));
-			  $p2 = array($wdatad,array(t('Pickup before'),t('Description'), t('At')),t('Available'));
-			  $p3 = array($odatad,array(t('Cancel'),t('Pickup before'),t('Description'), t('At')),t('In process'));
-			  $p4 = array($fdatad,array(t('Incurred on'),t('Description'), t('Amt')),t('Fines and fees'));
+			  $p1 = array($cdatad,array(t('Renew'),t('Due Date'),t('Title'),t(' ')),t('Checked Out'));
+			  $p2 = array($wdatad,array(t('Pickup Before'),t('Title'), t('At')),t('Available Requests'));
+			  $p3 = array($odatad,array(t('Cancel'),t('Request Expires'),t('Title'), t('At')),t('Pending Requests'));
+			  $p4 = array($fdatad,array(t('Incurred On'),t('Title'), t('Amt')),t('Fines and Fees'));
 			  $p5 = array($ndatad,array(t('Date'),t('Item and message'), t('At')),t('Notices'));
                           $form['panels']=  array(
 			    '#type'=>'markup',
@@ -281,12 +307,13 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                                                  '#type'=>'hidden', '#value'=>count($odatad),); 
 		          //$blocks['content'] .=   _patroninfo_tabs(array($p1,$p2,$p3,$p4,$p5));
                           $blocks['content'] .= drupal_render_form('renewform',$form);
-			  $blocks['content'] .= __build_refbox() ;
+			  //$blocks['content'] .= __build_refbox() ;
                           if (variable_get('patroninfo_debug',0)) {
-                               $blocks['content'] .= "URL:$url<br/>$stuff<br/>". 
+                               $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>". 
 			       print_r($pima,TRUE).
 			       print_r($_SESSION,TRUE).
 			       print_r($_REQUEST,TRUE).
+			       print_r("<br/>POST DATA ",TRUE).
 			       print_r($_POST,TRUE).
 			       print_r("<br/>Session id is " .session_id(),TRUE).
 			       print_r("<br/>SID " .SID,TRUE).
@@ -420,8 +447,29 @@ function _patroninfo_add_local() {
    drupal_add_js(drupal_get_path('module', 'patroninfo') .'/js/ui.draggable.js');
    drupal_add_js(drupal_get_path('module', 'patroninfo') .'/js/ui.dialog.js');
    $boiler = '
-      $(document).ready(function(){ $("#pi-tabs > ul").tabs(); });
-      ';
+    $(document).ready(function(){ 
+                      $("#pi-tabs > ul").tabs();
+	              $("#cbottonc").val("Renew marked items");
+		      $(".ui-tabs-nav > li > a").bind("click",function(event) 
+                      {
+                      console.log("Clicked");
+                      var t = event.srcElement.innerText;
+                      console.log(t);
+                      if (!t.match("Checked")){
+			$("#cbottona").hide();
+			$("#cbotton").hide();
+			$("#cbottonc").val("Cancel marked items");
+                      } 
+                      if (t.match("Checked") ){
+			$("#cbottona").show();
+			$("#cbotton").show();
+			$("#cbottonc").val("Renew marked items");
+                      } 
+                      }
+                      );
+    } );
+    ';
+
    drupal_add_js($boiler,'inline');
 }
 
@@ -550,73 +598,20 @@ function patroninfo_list() {
   }
 }
 
-function _patroninfo_process_items(&$var) {
-    foreach($var->items as $item) {
-        $note = '';
-        if (($item->status == 'chrged') ||
-        ($item->status == ' RECEIVED') ||
-        ($item->status == 'Received')
-        ) {
-            if ($item->od == $item->rd) {
-                $due = $item->od;
-            } else {
-                $due = $item->rd;
-            }
-            if (strlen($item->re) > 0) {
-                $note = "Recalled. Please note due date.";
-                $due = $item->re;
-            }
-            if (!empty($item->vstatus)) {
-                $note .= ' ' .$item->vstatus;
-            }
-            if ($due == $today) {
-                // the space makes the string sort to the top -- so leave it there.
-                // the span is for anyone who wants to style things due today.
-                if (strlen($item->re) > 0) {
-                    $note = "Recalled. Please note due date.";
-                    $due = $item->re;
-                }
-                if (!empty($item->vstatus)) {
-                    $note .= ' ' .$item->vstatus;
-                }
-                $ndatad[] = array($due, $item->tl . t('Location:').$item->lo." $note", '');
-                $ncdatad[] = array(index => $nindex++, due => $due);
-            }
-            if ($item->status == ' SHIPPED' || $item->status == 'pahr') {
-                $shipped = $item->ed;
-                $odatad[] = array($shipped, $item->tl, $item->lo);
-            }
-            if ($item->status == 'waiting') {
-                if (isset($item->url) && $item->url != '') {
-                    $at = _patroninfo_link(t('Get It!'), 'patroninfo-link', $item->url);
-                } else {
-                    $at = $item->lo;
-                }
-                $before = $item->ed;
-                $wdatad[] = array($before, $item->tl, $at);
-            }
-            if ($item->status == 'finef') {
-                $am = substr($item->am, 0, strlen-2).'.'.substr($item->am, -2);
-                $fdatad[] = array($item->ed, $item->tl, $am);
-            }
-        }
-        return array(cdatad, ndatad, odatad, wdatad, fdatad);
-        }
-}
-
 function __erase_cookie_header($cookiename) {
         $backtime = mktime()-36000;
         $backdate = date("l, d-M-y H:i:s", ($backtime));
         $tmpstring =$_COOKIE[$cookiename];
         //$tmpstring = urlencode($tmpstring);
-        return("Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=.cornell.edu");
+        return("Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=".$_SERVER['SERVER_NAME']);
 } 
 function __set_cookie_header($cookiename,$value) {
         $backtime = mktime()+36000;
         $backdate = date("l, d-M-y H:i:s", ($backtime));
         $tmpstring = urlencode($value);
-        return("Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=.cornell.edu");
+        return("Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=".$_SERVER['SERVER_NAME']);
 } 
+
 function __build_cite_link(&$item) {
 if ($item->system !='illiad') {
   $genre='Book';
