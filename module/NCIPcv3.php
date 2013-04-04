@@ -1,57 +1,66 @@
 <?php
 //session_start();
 include_once('log.php');
+include_once('NCIPvx.php');
+include_once('vxws.inc');
 // client for ncip protocol
 // by no means does this support the complete protocol.
 // just the items needed for specific ILS functions, by filling xml templates.
 // by means of the version parameter, we could support different template names.
-class NCIPc {
- const  authtmp = 'templates/AuthenticateUser.xml';
- const  authresptmp = 'templates/AuthenticateUserResponse.xml';
- const  luutmp = 'templates/LookupUser.xml';
- const  luitmp = 'templates/LookupItem.xml';
- const  lubtmp = 'templates/LookupItemBibId.xml';
- const  luvtmp = 'templates/LookupVersion.xml';
- const  rqitmp = 'templates/RequestItem.xml';
- const  crqtmp = 'templates/CancelRequestItem.xml';
- const  rcitmp = 'templates/RecallItem.xml';
- const  crctmp = 'templates/CancelRecallItem.xml';
- const  rentmp = 'templates/RenewItem.xml';
- const  xluutmp = 'templates/XCLookupUser.xml';
- const  xgatmp = 'templates/XCGetAvailability.xml';
- //const  ncipserver = 'http://dss-es287linux.library.cornell.edu:8180/NCIPToolkit/ncipToolkit';
- const  ncipserver = 'http://dss-es287linux.library.cornell.edu:8180/voyagerncip/ncipToolkit';
- //const  illiad_ncipserver = 'http://dss-es287linux.library.cornell.edu:8180/NCIPToolkit/ncipToolkit';
- //const  voyager_ncipserver = 'http://dss-es287linux.library.cornell.edu:8180/voyagerncip/ncipToolkit';
-// const  illiad_ncipserver = 'http://test-www.library.cornell.edu:8080/illiadncip/ncipToolkit';
-// const  illiad_ncipserver = 'http://catalog-test.library.cornell.edu:8080/illiadncip/ncipToolkit';
-//const  voyager_ncipserver = 'http://test-www.library.cornell.edu:8080/voyagerncip/ncipToolkit';
-// const  voyager_ncipserver = 'http://catalog-test.library.cornell.edu:8080/voyagerncip/ncipToolkit';
-const  voyager_ncipserver = 'http://catalog-test.library.cornell.edu:8080/voyagerncip/ncipToolkit';
-const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/ncipToolkit';
+// The version of the ncip interface actually uses
+// direct vxws calls to voyager to 
+// renew, and to cancel.
+class NCIPcv3 extends NCIPvx {
+ const  authtmp = 'templatesv2/AuthenticateUser.xml';
+ const  authresptmp = 'templatesv2/AuthenticateUserResponse.xml';
+ const  luutmp = 'templatesv2/LookupUser.xml';
+ const  luitmp = 'templatesv2/LookupItem.xml';
+ const  lubtmp = 'templatesv2/LookupItemBibId.xml';
+ const  luvtmp = 'templatesv2/LookupVersion.xml';
+ const  rqitmp = 'templatesv2/RequestItem.xml';
+ const  crqtmp = 'templatesv2/CancelRequestItem.xml';
+ const  rcitmp = 'templatesv2/RecallItem.xml';
+ const  crctmp = 'templatesv2/CancelRecallItem.xml';
+ const  rentmp = 'templatesv2/RenewItem.xml';
+ const  xluutmp = 'templatesv2/XCLookupUser.xml';
+ const  xgatmp = 'templatesv2/XCGetAvailability.xml';
+ //const  ncipserver = 'http://es287-dev.library.cornell.edu:8180/voyagerncip/ncipToolkit';
+ //const  voyager_ncipserver = 'http://catalog.library.cornell.edu:8080/voyagerncip/ncipToolkit';
+ const  voyager_ncipserver = 'http://es287-dev.library.cornell.edu:8080/voyager/NCIPResponder';
+ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/ncipToolkit';
 
  const  stale_seconds = 1800;
- const  hdr  = '<!DOCTYPE NCIPMessage PUBLIC "-//NISO//NCIP DTD Version 1//EN" "http://xml.coverpages.org/NCIP-v10a-DTD.txt">'; 
+ //const  hdr  = '<!DOCTYPE NCIPMessage PUBLIC "-//NISO//NCIP DTD Version 1//EN" "http://xml.coverpages.org/NCIP-v10a-DTD.txt">'; 
+ const  hdr  = '';
  private $userid = ''; 
  private $username = ''; 
  private $password = ''; 
+ private $system = ''; 
  private $authenticated = 0; 
  private $ch; 
  private $version = 1;
  private $trace = 0;
  private $logger;
  private $ncips;
+ private $authdom;
+ private  $authrespdom;
+ private  $luudom ;
+ private  $xluudom;
+ private  $luidom ;
+ private  $lubdom ;
+ private  $luvdom ;
+ private  $rqidom ;
+ private  $crqdom ;
+ private  $rcidom ;
+ private $rendom ;
+ private $crcdom ;
+ private $xgadom ;
 
- public function __construct($s) {
+ public function __construct($s,$ncp) {
  $this->logger = new log(); 
-   $this->ncips = NCIPC::ncipserver;
- if ($s == "illiad") { 
-   $this->ncips = NCIPC::illiad_ncipserver;
- }
- if ($s == "voyager") { 
-   $this->ncips = NCIPC::voyager_ncipserver;
- }
-
+ $this->ncips = $ncp;
+ $this->system = $s;
+ $this->loadAll();
  }
 
  public function __destruct() {; }
@@ -60,7 +69,19 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
 			                   return $this->authenticated; 
                                        }
  public function get_userid()   { return $this->userid; }
+ public function set_userid($userid) {
+   $old = $this->userid;
+   $this->userid = $userid;
+   return $old;
+ }
+
  public function get_password() { return $this->password; }
+ public function set_password($password) {
+   $old = $this->password;
+   $this->password = $password;
+   return $old;
+ }
+
 
  public function get_version() { return $this->version; }
  public function set_version($version) { 
@@ -90,56 +111,48 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
    return $old; 
  }
 
- public function authenticate($user,$password = NULL) {
-    global $authdom;
-    global $authrespdom;
+ public function get_system() { return $this->system; }
+ public function set_system($system) {
+   $old = $this->system;
+   $this->system = $system;
+   return $old;
+ }
+
+// no need to authenticate for ncip v2 server -- just store values.
+ public function authenticate($user,$password = NULL,$uid = NULL,$pid = NULL) {
   if ($this->get_trace()) $this->general("Current authenticated flag:" . $this->authenticated);
+  if (!empty($pid) ){
+    $this->pid = $pid; 
+    $this->userid = $pid; 
+  }
   if (empty($password) ){
   $this->userid = $user; 
   } else { 
    $this->username = $user; 
    $this->password = $password; 
+   $this->userid = $uid; 
   }
-  $dumxml      = clone ($authrespdom);
-  /* this does not really work, and I do not know why */
-  $dumxml->AuthenticateUserResponse->UniqueUserId[0]->UserIdentifierValue[0] = $this->userid;
-  $xml      = clone ($authdom);
-  $xml->AuthenticateUser->AuthenticationInput[0]->AuthenticationInputData[0] = $user;
-  $xml->AuthenticateUser->AuthenticationInput[1]->AuthenticationInputData[0] = $password;
-  $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
-  if ($this->trace) $this->general($request);
-  $this->ch_init($request);
-  if ($this->authenticated) { 
-      return $dumxml; 
-  }
-  $buf2 = curl_exec ($this->ch); // execute the curl command
-  try {
-  $doc = new SimpleXmlElement($buf2, LIBXML_NOCDATA);
-    } 
-    catch (Exception $e) {
-       $doc = new SimpleXmlElement(
-         "<Problem><ErrorCode>500</ErrorCode><ErrorMessage>Communication Error</ErrorMessage></Problem>", LIBXML_NOCDATA);
-    }
-  $result = $doc->xpath('//Problem');
+ $doc = simplexml_load_string("<NCIPMessage/>");
+ $result = $doc->xpath('//Problem');
   if (isset($result[0])) {
-    $this->authenticated = 0; 
+    $this->authenticated = 0;
     $_SESSION['authenticated'] = 0;
-  } else  { 
+  } else  {
     $_SESSION['authenticated'] = 1;
-    $this->authenticated = 1; 
+    $this->authenticated = 1;
   }
   if ($this->trace) {
       $this->general( "Authenticated:" . $this->authenticated);
-      $this->general( "message:" . $buf2);
-  } 
+      $this->general( "message:" . $doc);
+  }
   return $doc;
  }
 
  public function lookupitem($id) {
     global $luidom;
-    $xml      = clone ($luidom);
-    $xml->LookupItem->UniqueItemId[0]->ItemIdentifierValue[0] = $id; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $xml      = clone ($this->luidom);
+    $xml->LookupItem->ItemId[0]->IdentifierValue[0] = $id; 
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->get_trace()) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
@@ -156,9 +169,9 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
 
  public function lookupitembibid($id) {
     global $lubdom;
-    $xml      = clone ($lubdom);
+    $xml      = clone ($this->lubdom);
     $xml->LookupItem->VisibleItemId[0]->VisibleItemIdentifier[0] = $id; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->trace) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
@@ -175,9 +188,9 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
 
  public function xclookupuser($id) {
     global $xluudom;
-    $xml      = clone ($xluudom);
+    $xml      = clone ($this->xluudom);
     $xml->XCLookupUser->UniqueUserId[0]->UserIdentifierValue[0] = $id; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->trace) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
@@ -192,17 +205,19 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
     return $doc;
  }
 
- public function lookupuser($id) {
+ public function lookupuser($user,$password = NULL,$uid = NULL,$pid = NULL) {
     global $luudom;
-    $xml      = clone ($luudom);
-    $xml->LookupUser->UniqueUserId[0]->UserIdentifierValue[0] = $id; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
-    if ($this->trace) $this->general($request);
+    $xml      = clone ($this->luudom);
+    print("LOOKUPUSER\n");
+    $xml->LookupUser->AuthenticationInput[0]->AuthenticationInputData = $user; 
+    $xml->LookupUser->AuthenticationInput[1]->AuthenticationInputData = $password; 
+    $request =  NCIPcv2::hdr.$xml->asXML();
+    if ($this->get_trace()) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
     if ($this->get_trace()) $this->general($buf2);
     try {
-    $doc = new SimpleXmlElement($buf2, LIBXML_NOCDATA);
+      $doc = new SimpleXmlElement($buf2, LIBXML_NOCDATA);
     } 
     catch (Exception $e) {
        $doc = new SimpleXmlElement(
@@ -213,12 +228,12 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
 
  public function requestitem($id,$loc,$date,$uid = NULL) {
     global $rqidom;
-    $xml      = clone ($rqidom);
+    $xml      = clone ($this->rqidom);
     $xml->RequestItem->UniqueUserId[0]->UserIdentifierValue[0] = $uid; 
     $xml->RequestItem->UniqueItemId[0]->ItemIdentifierValue[0] = $id; 
     $xml->RequestItem->ShippingInformation[0]->PhysicalAddress[0] = $loc; 
     $xml->RequestItem->PickupExpiryDate[0] = $date; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->trace) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
@@ -235,9 +250,9 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
 
  public function xcgetavailability($id) {
     global $xgadom;
-    $xml      = clone ($xgadom);
+    $xml      = clone ($this->xgadom);
     $xml->XCGetAvailability->UniqueItemId[0]->ItemIdentifierValue[0] = $id; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->trace) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
@@ -252,15 +267,37 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
     return $doc;
  }
 
- public function cancelrequestitem($id,$uid = NULL) {
-    global $crqdom;
-    $xml      = clone ($crqdom);
-    $xml->CancelRequestItem->UniqueUserId[0]->UserIdentifierValue[0] = $uid; 
-    $xml->CancelRequestItem->UniqueItemId[0]->ItemIdentifierValue[0] = $id; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+ public function cancelrecallitem($id,$uid=NULL, $tid=NULL,$type='R') {
+ return  $this->cancelrequestitem($id,$uid,$tid,$type);
+ }
+ public function cancelrequestitem($id,$uid=NULL, $tid=NULL,$type=NULL) {
+    //$xml      = clone ($this->crqdom);
+    //$xml->CancelRequestItem->AuthenticationInput[0]->AuthenticationInputData = $this->username; 
+    //$xml->CancelRequestItem->AuthenticationInput[1]->AuthenticationInputData = $this->password; 
+    //$xml->CancelRequestItem->RequestId[0]->RequestIdentifierValue[0] = $tid; 
+    //$xml->CancelRequestItem->ItemId[0]->ItemIdentifierValue[0] = $id; 
+    $pid = $this->pid;
+    $homedb = _vxwsdbid();
+    $oper='holds';
+    if ($type == 'C') $oper = 'callslips'; 
+    $request = _vxws() . "/vxws/patron/$pid/circulationActions/requests/$oper/$homedb%7C$tid?patron_homedb=$homedb";
     if ($this->trace) $this->general($request);
-    $this->ch_init($request);
-    $buf2 = curl_exec ($this->ch); // execute the curl command
+    //$this->ch_init($request);
+    //$buf2 = curl_exec ($this->ch); // execute the curl command
+    //print_r("this is the end of the curl_exec\n");
+    //print $buf2;
+    $opts = array(
+    'http'=>array(
+    'method'=>"DELETE",
+    'header'=>"Accept-language: en\r\n" .
+              "Cookie: foo=bar\r\n"
+     )
+     );
+     $context = stream_context_create($opts);
+    // Open the file using the HTTP headers set above
+    //$this->ch_init($request);
+    //$buf2 = curl_exec ($this->ch); // execute the curl command
+    $buf2 = file_get_contents($request, false, $context);
     if ($this->get_trace()) $this->general($buf2);
     try {
     $doc = new SimpleXmlElement($buf2, LIBXML_NOCDATA);
@@ -268,21 +305,42 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
     catch (Exception $e) {
        $doc = new SimpleXmlElement(
          "<Problem><ErrorCode>500</ErrorCode><ErrorMessage>Communication Error</ErrorMessage></Problem>", LIBXML_NOCDATA);
+       return $doc;
     }
+    $result = $doc->xpath('//reply-code');
+    $error = 0;
+    while(list( , $node) = each($result)) {
+    $error = $node;
+    }
+    $result = $doc->xpath('//reply-text');
+    while(list( , $node) = each($result)) {
+    $errortext = $node;
+    }
+    //print "ERROR code is $error\n";
+    //print "ERROR text is $errortext\n";
+    if ($error ==  '0') {
+       $doc = new SimpleXmlElement("<NCIPMessage/>");
+    }
+    if ($error !=  '0') {
+       $doc = new SimpleXmlElement(
+         "<Problem><ErrorCode>$error</ErrorCode><ErrorMessage>$errortext</ErrorMessage></Problem>", LIBXML_NOCDATA);
+    }
+    if ($this->get_trace()) $this->general(print_r($doc,TRUE));
     return $doc;
  } 
 
  public function recallitem($id,$loc,$date,$uid=NULL) {
     global $rcidom;
-    $xml      = clone ($rcidom);
+    $xml      = clone ($this->rcidom);
     $xml->RecallItem->UniqueItemId[0]->ItemIdentifierValue[0] = $id; 
     $xml->RecallItem->UniqueUserId[0]->UserIdentifierValue[0] = $uid; 
     $xml->RecallItem->DesiredDueDate[0] = $date; 
     $xml->RecallItem->ShippingInformation[0]->PhysicalAddress[0] = $loc; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->trace) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
+    print $buf2;
     if ($this->get_trace()) $this->general($buf2);
     try {
     $doc = new SimpleXmlElement($buf2, LIBXML_NOCDATA);
@@ -294,12 +352,13 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
     return $doc;
  }
 
- public function cancelrecallitem($id,$uid = NULL) {
+ private function xcancelrecallitem($id,$uid = NULL) {
     global $crcdom;
-    $xml      = clone ($crcdom);
-    $xml->CancelRecallItem->UniqueUserId[0]->UserIdentifierValue[0] = $uid; 
-    $xml->CancelRecallItem->UniqueItemId[0]->ItemIdentifierValue[0] = $id; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $xml      = clone ($this->crcdom);
+    $xml->CancelRecallItem->ItemId[0]->ItemIdentifierValue[0] = $id; 
+    $xml->CancelRecallItem->AuthenticationInput[0]->AuthenticationInputData = $this->username; 
+    $xml->CancelRecallItem->AuthenticationInput[1]->AuthenticationInputData = $this->password; 
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->trace) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
@@ -314,16 +373,28 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
     return $doc;
  } 
 
+// renewitem modified to directly use voyager services.
  public function renewitem($id,$uid=NULL,$date=NULL) {
-    global $rendom;
-    $xml      = clone ($rendom);
-    $xml->RenewItem->UniqueItemId[0]->ItemIdentifierValue[0] = $id; 
-    $xml->RenewItem->UniqueUserId[0]->UserIdentifierValue[0] = $uid; 
-    $xml->RenewItem->DesiredDateForReturn[0] = $date; 
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $pid = $this->pid;
+    $homedb = _vxwsdbid();
+    if ($id == 'all') {
+    $thomedb = ''; 
+    } else {
+    $thomedb = "$homedb%7C$id"; 
+    }
+    $request = _vxws() . "/vxws/patron/$pid/circulationActions/loans/$thomedb?patron_homedb=$homedb";
+    if ( $date != NULL ) {
+    }
     if ($this->trace) $this->general($request);
-    $this->ch_init($request);
-    $buf2 = curl_exec ($this->ch); // execute the curl command
+    $opts = array(
+    'http'=>array(
+    'method'=>"POST",
+    'header'=>"Accept-language: en\r\n" .
+              "Cookie: foo=bar\r\n"
+     )
+     );
+     $context = stream_context_create($opts);
+    $buf2 = file_get_contents($request, false, $context);
     if ($this->get_trace()) $this->general($buf2);
     try {
     $doc = new SimpleXmlElement($buf2, LIBXML_NOCDATA);
@@ -332,13 +403,29 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
     $doc = new SimpleXmlElement(
          "<Problem><ErrorCode>500</ErrorCode><ErrorMessage>Communication Error</ErrorMessage></Problem>", LIBXML_NOCDATA);
     }
+    $result = $doc->xpath('//reply-code');
+    $error = 0;
+    while(list( , $node) = each($result)) {
+    $error = $node;
+    }
+    $result = $doc->xpath('//reply-text');
+    while(list( , $node) = each($result)) {
+    $errortext = $node;
+    }
+    if ($error ==  '0') {
+       $doc = new SimpleXmlElement("<NCIPMessage/>"); 
+    }
+    if ($error !=  '0') {
+       $doc = new SimpleXmlElement(
+         "<Problem><ErrorCode>$error</ErrorCode><ErrorMessage>$errortext</ErrorMessage></Problem>", LIBXML_NOCDATA);
+    }
     return $doc;
  }
 
  public function lookupversion() {
     global $luvdom;
-    $xml      = clone ($luvdom);
-    $request =  'NCIP='.NCIPc::hdr.$xml->asXML();
+    $xml      = clone ($this->luvdom);
+    $request =  NCIPcv2::hdr.$xml->asXML();
     if ($this->trace) $this->general($request);
     $this->ch_init($request);
     $buf2 = curl_exec ($this->ch); // execute the curl command
@@ -355,7 +442,7 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
 
  private function ch_init($request) {
     if (empty($this->ch) ) $this->ch = curl_init();
-    $filename = "/tmp/cookieFileName-".$this->username;
+    $filename = "/tmp/cookieFileName-".$this->system."-".$this->username;
     if (file_exists($filename)) { 
            $stat = stat($filename);
            $mtimef =$stat['mtime'];
@@ -394,17 +481,20 @@ const  illiad_ncipserver = 'http://catalog.library.cornell.edu:8080/illiadncip/n
  private function general($msg) { 
    $this->logger->user($_SERVER['REMOTE_ADDR'] ,$this->username,$msg);
  }
+ public function loadAll() { 
+ $this->authdom=  simplexml_load_file(ncipcv2::authtmp);
+ $this->authrespdom =  simplexml_load_file(ncipcv2::authresptmp);
+ $this->crqdom =  simplexml_load_file(ncipcv2::crqtmp);
+ $this->rendom =  simplexml_load_file(ncipcv2::rentmp);
+ // these will fail.
+ $this->luudom =  simplexml_load_file(ncipcv2::luutmp);
+ $this->xluudom =  simplexml_load_file(ncipcv2::xluutmp);
+ $this->luidom =  simplexml_load_file(ncipcv2::luitmp);
+ $this->lubdom =  simplexml_load_file(ncipcv2::lubtmp);
+ $this->luvdom =  simplexml_load_file(ncipcv2::luvtmp);
+ $this->rqidom =  simplexml_load_file(ncipcv2::rqitmp);
+ $this->rcidom =  simplexml_load_file(ncipcv2::rcitmp);
+ $this->crcdom =  simplexml_load_file(ncipcv2::crctmp);
+ $this->xgadom =  simplexml_load_file(ncipcv2::xgatmp);
+ }
 };
- $authdom=  simplexml_load_file(ncipc::authtmp);
- $authrespdom =  simplexml_load_file(ncipc::authresptmp);
- $luudom =  simplexml_load_file(ncipc::luutmp);
- $xluudom =  simplexml_load_file(ncipc::xluutmp);
- $luidom =  simplexml_load_file(ncipc::luitmp);
- $lubdom =  simplexml_load_file(ncipc::lubtmp);
- $luvdom =  simplexml_load_file(ncipc::luvtmp);
- $rqidom =  simplexml_load_file(ncipc::rqitmp);
- $crqdom =  simplexml_load_file(ncipc::crqtmp);
- $rcidom =  simplexml_load_file(ncipc::rcitmp);
- $rendom =  simplexml_load_file(ncipc::rentmp);
- $crcdom =  simplexml_load_file(ncipc::crctmp);
- $xgadom =  simplexml_load_file(ncipc::xgatmp);

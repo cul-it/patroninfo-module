@@ -1,0 +1,21 @@
+<NCIPMessage xmlns="http://www.niso.org/2008/ncip" xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+  <LookupUser>
+    <AuthenticationInput>
+      <AuthenticationInputData>%USERID%</AuthenticationInputData>
+      <AuthenticationDataFormatType>text</AuthenticationDataFormatType>
+      <AuthenticationInputType>Username</AuthenticationInputType>
+    </AuthenticationInput>
+    <AuthenticationInput>
+      <AuthenticationInputData>%PASSWORD%</AuthenticationInputData>
+      <AuthenticationDataFormatType>text</AuthenticationDataFormatType>
+      <AuthenticationInputType>Password</AuthenticationInputType>
+    </AuthenticationInput>
+    <UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Block Or Trap</UserElementType>
+<!--
+    <LoanedItemsDesired/>
+    <RequestedItemsDesired/>
+    <UserFiscalAccountDesired/>
+-->
+
+  </LookupUser>
+</NCIPMessage>

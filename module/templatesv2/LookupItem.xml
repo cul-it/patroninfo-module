@@ -1,0 +1,54 @@
+<?xml version ='1.0' encoding='UTF-8'?>
+<!DOCTYPE NCIPMessage PUBLIC "-//NISO//NCIP DTD Version 1//EN" "http://xml.coverpages.org/NCIP-v10a-DTD.txt">
+<NCIPMessage version="http://www.niso.org/ncip/v1_0/imp1/dtd/ncip_v1_0.dtd">
+        <LookupItem>
+                <InitiationHeader>
+                        <FromAgencyId>
+                                <UniqueAgencyId>
+                                        <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                        <Value>Cornell University</Value>
+                                </UniqueAgencyId>
+                        </FromAgencyId>
+                        <ToAgencyId>
+                                <UniqueAgencyId>
+                                        <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                        <Value>Cornell University</Value>
+                                </UniqueAgencyId>
+                        </ToAgencyId>
+                </InitiationHeader>
+                <UniqueItemId>
+                        <UniqueAgencyId>
+                                <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                <Value>Cornell University</Value>
+                        </UniqueAgencyId>
+                        <ItemIdentifierValue>%ITEM_ID%</ItemIdentifierValue>
+                </UniqueItemId>
+                <ItemElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm</Scheme>
+                        <Value>Bibliographic Description</Value>
+                </ItemElementType>
+                <ItemElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm</Scheme>
+                        <Value>Circulation Status</Value>
+                </ItemElementType>
+                <ItemElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm</Scheme>
+                        <Value>Electronic Resource</Value>
+                </ItemElementType>
+                <ItemElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm</Scheme>
+                        <Value>Hold Queue Length</Value>
+                </ItemElementType>
+                <ItemElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm</Scheme>
+                        <Value>Item Description</Value>
+                </ItemElementType>
+                <ItemElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/itemelementtype/itemelementtype.scm</Scheme>
+                        <Value>Location</Value>
+                </ItemElementType>
+                <CurrentBorrowerDesired />
+                <CurrentRequestersDesired />
+        </LookupItem>
+</NCIPMessage>
+

@@ -1,0 +1,42 @@
+<?xml version="1.0"?> 
+<!DOCTYPE NCIPMessage PUBLIC "-//NISO//NCIP DTD Version 1//EN" "http://xml.coverpages.org/NCIP-v10a-DTD.txt">
+<NCIPMessage version="http://www.niso.org/ncip/v1_0/imp1/dtd/ncip_v1_0.dtd"> 
+  <AuthenticateUser> 
+    <InitiationHeader> 
+      <FromAgencyId> 
+          <UniqueAgencyId> 
+              <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme> 
+              <Value>Cornell University</Value> 
+          </UniqueAgencyId> 
+      </FromAgencyId> 
+      <ToAgencyId> 
+          <UniqueAgencyId> 
+              <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme> 
+              <Value>Cornell University</Value> 
+          </UniqueAgencyId> 
+      </ToAgencyId> 
+    </InitiationHeader> 
+    <AuthenticationInput> 
+        <AuthenticationInputData>%USERNAME%</AuthenticationInputData> 
+        <AuthenticationDataFormatType> 
+            <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/FormatType.scm</Scheme> 
+            <Value>Text</Value> 
+        </AuthenticationDataFormatType> 
+        <AuthenticationInputType> 
+            <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AuthenticationType.scm</Scheme> 
+            <Value>Username</Value> 
+        </AuthenticationInputType> 
+    </AuthenticationInput> 
+    <AuthenticationInput> 
+        <AuthenticationInputData>%PASSWORD%</AuthenticationInputData> 
+        <AuthenticationDataFormatType> 
+            <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/FormatType.scm</Scheme> 
+            <Value>Text</Value> 
+        </AuthenticationDataFormatType> 
+        <AuthenticationInputType> 
+            <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AuthenticationType.scm</Scheme> 
+            <Value>Password</Value> 
+        </AuthenticationInputType> 
+    </AuthenticationInput> 
+  </AuthenticateUser> 
+</NCIPMessage>

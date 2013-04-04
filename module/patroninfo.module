@@ -6,6 +6,7 @@
  */
 $patroninfo_data;
 
+
 define('DEFAULT_API','http://wwwdev.library.cornell.edu/cgi-bin/ilsapi2.cgi?netid=');
 define('OTHER_USER','see other users library accounts');
 define('CONFIGURE_ILS','configure ils api feeds');
@@ -31,12 +32,23 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                         _patroninfo_add_local(); 
                         $ts  = new views_tabset; 
 			$netid = cu_authenticate();
+			if ($_COOKIE['netid']) { // make sure netid is never stale.
+ 			  unset($_COOKIE['netid']);
+                        }
 			$actualnetid = $netid;
+                        //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
+                        //if ($netid == 'es287'){$netid = 'gid-wittep';}
+                        //if ($netid == 'es287'){$netid = 'sg532';}
+                        //if ($netid == 'es287'){$netid = 'gid-hollisst@CORNELL.EDU';}
 			$netid = str_replace('@CORNELL.EDU','',$netid);
-                        //if ($netid == 'es287'){$netid = 'gid-manlyc@CORNELL.EDU';}
+                        //if ($netid == 'es287'){$netid = 'epe3';}
                         //if ($netid == 'es287'){$netid = 'aa34';}
                         //if ($netid == 'es287'){$netid = 'aa239';}
-                        //if ($netid == 'es287'){$netid = 'ren5';}
+                        //if ($netid == 'es287'){$netid = 'jk252';}
+                        //if ($netid == 'es287'){$netid = 'epr29';}
+                        //if ($netid == 'es287'){$netid = 'keb11';}
+                        //if ($netid == 'es287'){$netid = 'kjh10';}
+                        //if ($netid == 'es287'){$netid = 'uak4';}
 			if (user_access(OTHER_USER)) {
                           $renewsessionname = $_COOKIE['renewsession']; 
 		          if (is_file("/tmp/".$renewsessionname.".txt")) {
@@ -54,6 +66,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    drupal_set_header(__erase_cookie_header('renewuser'));
                           }
                         }  
+
 		        if (isset($netid) && $netid != '') { 	
                           $blocks['subject'] = t('PatronInfo');
                           $url=variable_get('patroninfo_target', DEFAULT_API).$netid;
@@ -82,7 +95,16 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                            }
 			  drupal_set_header(__erase_cookie_header('pimessage'));
 		          }
-
+                          $api_blocks = '';
+                          $rdenied = 'N';
+                          $rbc = $var->patron->bc;
+                          if ($rbc != '' ) {
+                            //$rdenied = __pa_renewal_denied($rbc) ;
+                            $api_blocks = __pa_renewal_denied_api($var->patron->pid) ;
+                            if ($api_blocks != '')  { $rdenied = 'Y'; }
+                          } else {
+                            $rdenied = 'Y';
+                          }
                           $_SESSION['all_json'] = $var;
 			  // form tree begins.
                           // because we render 'manually', some stuff does not show up.
@@ -103,6 +125,12 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                             '#title' => t("Look up user's info"),
 			   );
                           } 
+			  $form['pid'] = array(
+			    '#id'  => 'pid',
+			    '#name'  => 'pid',
+			    '#type'  => 'hidden',
+			    '#value'  => $var->patron->pid,
+			   );
 			  $form['bc'] = array(
 			    '#id'  => 'bc',
 			    '#name'  => 'bc',
@@ -133,13 +161,6 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    '#type'  => 'hidden',
 			    '#value'  => $netid,
 			   );
- 			   $form['submit'] = array(
-			    '#id'  => 'cbottonc',
-			    '#name'  => 'cbottonc',
-			    '#type'  => 'submit',
-			    '#value'  => t('Renew marked items'),
-			    '#button_type'  => 'button',
-			    );
  			   $form['cbott'] = array(
 			    '#id'  => 'cbotton',
 			    '#name'  => 'cbotton',
@@ -153,6 +174,20 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    '#type'  => 'button',
 			    '#button_type'  => 'button',
 			    '#value'  => t('Export All items'),
+			    );
+ 			   $form['submit'] = array(
+			    '#id'  => 'cbottonc',
+			    '#name'  => 'cbottonc',
+			    '#type'  => 'submit',
+			    '#value'  => t('Renew marked items'),
+			    '#button_type'  => 'button',
+			    );
+ 			   $form['xsubmit'] = array(
+			    '#id'  => 'cbottond',
+			    '#name'  => 'cbottond',
+			    '#type'  => 'submit',
+			    '#value'  => t('Renew all voyager items'),
+			    '#button_type'  => 'button',
 			    );
 			  if (user_access(OTHER_USER)) {
  			   $form['cbottb'] = array(
@@ -171,25 +206,30 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    );
                            }
 			   $disabled = 1;
-                           if ($var->patron->status != 'Active' ) { 
+                           if ($var->patron->status != 'Active' || $rdenied == 'Y' ) { 
                                $disabled = 1;
                            } else { 
                                $disabled = 0; 
                            }
+                           if ($rdenied == 'Y') {
+                               $rblock_msg = "You are blocked from renewing.$api_blocks";
+                           } 
                           foreach($var->items as $item) {
-                            $note = '';
+                            $modate = $note = '';
 			    if (($item->status == 'chrged') || 
                              ($item->status == ' RECEIVED')  ||
                              ($item->status == 'Received') 
                              ) { 
 			      if ($item->od == $item->rd) { $due = $item->od;} else { $due=$item->rd;}
+                              $modate = date("M", mktime(0, 0, 0, substr($due,5,2),1));
+                              $visdue = $modate . substr($due,7,3) . '-'. substr($due,0,4);
                               if (strlen($item->re) > 0) { $note = "Recalled. Please note due date."; $due = $item->re;}
                               if (!empty($item->vstatus)) { $note .= ' ' .$item->vstatus;}
                               if ($due == $today) { 
 				// the space makes the string sort to the top -- so leave it there.
                                 // the span is for anyone who wants to style things due today.	
                                 if(!empty($item->odt)) $time = ' by ' . $item->odt  ;
-                                $due = ' <span class="patroninfo-today">*' . $due . $time . '</span>.';
+                                $visdue = ' <span class="patroninfo-today">* TODAY ' . $visdue . $time . '</span>.';
                               } 
 			      // create the form element 
 			          $msg = ''; 
@@ -216,7 +256,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                               } 
 			      $r .=  $msg ;//. __build_cite_link($item);
                               //$cdatad[]= array($due,$r.$item->tl . t('Location:').$item->lo.". $note",'');
-                              $cdatad[]= array($r,$due,$item->tl . t('Location:').$item->lo.". $note". __build_cite_link($item). __build_coins($item),'');
+                              $cdatad[]= array($r,$visdue,$item->tl . t('Location:').$item->lo.". $note". __build_cite_link($item). __build_coins($item),'');
                               $scdatad[] = array(index => $cindex++,  due => $due); 
                               $cdata.= '<li class=patroninfo-item>'.$item ->tl. ' '. $due .  t(' borrowed from '). $item ->lo. '</li>';
 		            }
@@ -245,7 +285,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                                         '#id'=> $k,
                                         '#name'=> $k,
                                         '#type'=> 'checkbox',
-                                        '#return_value' => $item->system.':'.($item->system == 'illiad' ? $item->ii:$item->iid),
+                                        '#return_value' => $item->system.':'.($item->system == 'illiad' ? $item->ii:$item->iid . ":transactionid:" . $item->tid .":" . $item->ttype ),
                                     );
 			      $r = drupal_render($form[$k]);
 			      }
@@ -264,14 +304,20 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                               }
 			      $before = $item->ed; 
 			      if ($item->system == 'illiad') {
+			        $before = $item->od; 
                                 //$wmsg = 'see at ' . $item->url . ' ' ;
                               } else {$wmsg='';};
-                              $wdatad[]= array($before,$item->tl. $wmsg,$at);
+                              $modate = date("M", mktime(0, 0, 0, substr($before,5,2),1));
+                              $visbefore = $modate . substr($before,7,3) . '-'. substr($before,0,4);
+                              $wdatad[]= array($visbefore,$item->tl. $wmsg,$at);
                               $wdata.= '<li class=patroninfo-item>'.$item ->tl.t('is waiting for you : '). $item ->lo. '</li>';
 		            }
 			    if ($item->status == 'finef') { 
+			      $finedate = $item->ed; 
+                              $modate = date("M", mktime(0, 0, 0, substr($finedate,5,2),1));
+                              $visfinedate= $modate . substr($finedate,7,3) . '-'. substr($finedate,0,4);
 			      $am = substr($item->am,0,strlen-2).'.'.substr($item->am,-2); 
-                              $fdatad[]= array($item->ed,$item->tl,$am);
+                              $fdatad[]= array($visfinedate,$item->tl,$am);
                               $fdata.= '<li class=patroninfo-item>'.$item ->tl.t('was due:'). $item ->od.t(' at '). $item ->lo. 
                                                 t('Amount:') .$item->am .'</li>';
 		            }
@@ -287,10 +333,18 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                              $cdatad = $cdatadx;
                            }
 			  //$you = $var->patron->last.','.$var->patron->given;
-                          $you = ($var->patron->last) ? ($var->patron->given . ' ' . $var->patron->last) : $netid;
-                          if ($var->patron->status != 'Active' ) { $you .= '. <i>Note</i>: &nbsp; your account has expired; please <a href="mailto:libpublicservices@cornell.edu">contact the library</a> for assistance.' ; $disabled = 1;}
+                         //$you=($var->patron->last)?($var->patron->given.' '.$var->patron->last):$netid;
+                         // if ($var->patron->status != 'Active' ) { $you .= '.&nbsp; <i>Note</i>: &nbsp; your account has expired; please <a href="mailto:libpublicservices@cornell.edu">contact the library</a> for assistance.' ; $disabled = 1;}
+                          $conmsg = "Please <a href=\"mailto:libpublicservices@cornell.edu\">contact the library</a> for assistance." ;
+                          $voyblocks  = ($rdenied == 'Y') ? "<br/>$rblock_msg  $deny_msg" : "";
+                          $you = (($var->patron->last) ? ($var->patron->given . ' '  . $var->patron->last) : $netid ) . $voyblocks;
+                          if ($disabled ) {
+                             $you .= "<i>Note</i>: &nbsp; $acc_trouble_msg $conmsg" ;
+                          }
 			  $ecount =  count($pima) > 0 ? count($pima)-1 . " errors": "" ;
-                          $blocks['content'] = "<h3 id='patroninfoid' class='patroninfo-title'>".t('Account information for')." $you // $ecount </h3>";
+                          //$wmsg = "Please note -- the Voyager catalog will be in read-only mode during software upgrade from the morning of Monday Dec 24 2012 until the morning of Wed. Jan 2 2013.  Users of the catalog will not be able to renew items, do holds, recalls, and delivery requests.  Returned items will not appear as returned until full production returns.";
+
+                          $blocks['content'] = "<h2>$wmsg</h2> <h3 id='patroninfoid' class='patroninfo-title'>".t('Account information for')." $you // $ecount </h3>";
 			  $p1 = array($cdatad,array(t('Renew'),t('Due Date'),t('Title'),t(' ')),t('Checked Out'));
 			  $p2 = array($wdatad,array(t('Pickup Before'),t('Title'), t('At')),t('Available Requests'));
 			  $p3 = array($odatad,array(t('Cancel'),t('Request Expires'),t('Title'), t('At')),t('Pending Requests'));
@@ -452,17 +506,27 @@ function _patroninfo_add_local() {
 	              $("#cbottonc").val("Renew marked items");
 		      $(".ui-tabs-nav > li > a").bind("click",function(event) 
                       {
-                      console.log("Clicked");
-                      var t = event.srcElement.innerText;
-                      console.log(t);
-                      if (!t.match("Checked")){
+                      var t = event.target.textContent;
+                      if (t.match("Pending")){
+			$("#cbottona").hide();
+			$("#cbotton").hide();
+			$("#cbottonc").val("Cancel marked items");
+			$("#cbottonc").show();
+                      } 
+                      if (t.match("Available")){
 			$("#cbottona").hide();
 			$("#cbotton").hide();
 			$("#cbottonc").val("Cancel marked items");
                       } 
+                      if (t.match("Fines") || t.match("Notices")){
+			$("#cbottona").hide();
+			$("#cbotton").hide();
+			$("#cbottonc").hide();
+                      } 
                       if (t.match("Checked") ){
 			$("#cbottona").show();
 			$("#cbotton").show();
+			$("#cbottonc").show();
 			$("#cbottonc").val("Renew marked items");
                       } 
                       }
@@ -702,3 +766,21 @@ function __build_refbox() {
     ';
     return $ret;
 }
+
+module_load_include('inc', 'patroninfo', 'vxws');
+
+function __pa_renewal_denied_api($patronid) {
+
+  $block = '';
+  $dbid = _vxwsdbid();
+  $restbase =_vxws();
+  $restapi="$restbase/vxws/patron/$patronid/patronStatus/blocks?patron_homedb=$dbid";
+  $patroni = file_get_contents($restapi);
+  $xml = simplexml_load_string($patroni);
+  $result = $xml->xpath("/response/blocks/institution/borrowingBlock/blockReason");
+  while(list( , $node) = each($result)) {
+    $block .= $node."\n";
+  }
+  return $block;
+}
+
