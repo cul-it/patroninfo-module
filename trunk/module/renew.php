@@ -1,6 +1,13 @@
 <?php
 $data = '';
+
 $dest='http://www.refworks.com/express/ExpressImport.asp?vendor=cornell.edu&filter=RefWorks%20Tagged%20Format&encoding=65001';
+$nciptypes['voyager'] = 'NCIPcv3';
+$ncipservers['voyager'] =  'http://es287-dev.library.cornell.edu:8080/voyager/NCIPResponder';
+
+$nciptypes['illiad'] = 'NCIPcv1';
+$ncipservers['illiad'] =  'http://catalog.library.cornell.edu:8080/illiadncip/ncipToolkit';
+
 $renewsessionname = $_COOKIE['renewsession'];
 $renewsession = $_COOKIE[$_COOKIE['renewsession']];
 $cdir = getcwd();
@@ -22,6 +29,34 @@ $var =  $_SESSION['all_json'];
 $requestc = 0;
 $renewablec = $_POST['item_cindex'];
 $cancelc = $_POST['item_crindex'];
+$post = $_POST;
+if (isset($_POST['cbottond'])) {
+  $renewablec = 1; 
+  $_POST['item_0_renew'] = 'voyager:all'  ;
+}
+
+
+if (isset($_POST['cbottono'])) {
+ header("Location: /index");
+ unset($_COOKIE['verify_netid']);
+ setcookie('verify_netid', "invalid", time() - 3600*25, '/', '.cornell.edu'); 
+ unset($_COOKIE['netid']);
+ setcookie('netid', "invalid", time() - 3600*25, '/', '.cornell.edu'); 
+ unset($_COOKIE['cuwltgttime']);
+ setcookie('cuwltgttime', "invalid", time() - 3600*25, '/', '.cornell.edu'); 
+ unset($_COOKIE['CUWALastWeblogin']);
+ setcookie('CUWALastWeblogin', "invalid", time() - 3600*25, '/', '.cornell.edu'); 
+ unset($_COOKIE['cuweblogin2']);
+ setcookie('cuweblogin2', "", time() - 3600*25, '/', '.cornell.edu'); 
+ unset($_COOKIE['__utma']);
+ setcookie('__utma', "", time() - 3600*25, '/', '.cornell.edu'); 
+ unset($_COOKIE['__utmb']);
+ setcookie('__utmb', "", time() - 3600*25, '/', '.cornell.edu'); 
+ unset($_COOKIE['__utmc']);
+ setcookie('__utmc', "", time() - 3600*25, '/', '.cornell.edu'); 
+ exit(0);
+} 
+
 for($i=0;$i<$renewablec;$i++) {
     if (isset($_POST['item_'.$i.'_renew']))  {
         $val = explode(":",$_POST['item_'.$i.'_renew']);
@@ -39,6 +74,10 @@ if (isset($_POST['cbotton'])) {
   exit(0);
 }
 include_once("NCIPc.php");
+include_once("NCIPcv1.php");
+include_once("NCIPcv2.php");
+include_once("NCIPcv3.php");
+$pid = $_POST['pid'];
 $sn = $_POST['sn'];
 $bc = $_POST['bc'];
 $inid = $_POST['inid'];
@@ -48,95 +87,37 @@ $_SESSION['renew_user'] = $_POST['netid'];
 $handle = fopen("/tmp/".$renewsessionname.".txt", "w+");
 fwrite($handle,$netid);
 fclose($handle);
-$auths = array('illiad' => array($netid,$netid,$netid), 'voyager' => array($bc,$sn,$inid));
+$auths = array('illiad' => array($netid,$netid,$netid,$netid), 'voyager' => array($bc,$sn,$inid,$pid));
+$nca = array();
 
 $errors = '';
+
 //if ($renewablec > 0 && $requestc>0 )  $r = implode(',',$requested);
 for($i=0;$i<$cancelc;$i++) {
     if ($_POST['item_'.$i.'_cancel']) { 
        $val = explode(":",$_POST['item_'.$i.'_cancel']);
        $sys = $val[0] ;
        $canceled [$sys][] = $val[1]; 
+       $canceledt [$sys][] = $val[3];
+       $canceledtt [$sys][] = $val[4];
     }
 }
 
-if (count($requested)) {
-foreach ($requested as $sysa => $ids) {
-  if (!isset($nca[$sysa])) {
-      $nca[$sysa] = new NCIPc($sysa);
-  }
-  $nc = $nca[$sysa];
-  $nc->set_trace(1);
-  $resp = $nc->authenticate($auths[$sysa][0],$auths[$sysa][1]);
-  $result = $resp->xpath('//Problem');
-  if (isset($result[0])) {
-     $errors .=  
-     print_r( '0',TRUE). '|'.
-     print_r( strval($result[0]->ErrorCode),TRUE). '|'.
-     print_r( strval($result[0]->ErrorMessage),TRUE).'*';
-   }   else {
-  }
-
-  if (count($ids)) {
-  foreach( $ids as $it) { 
-   $resp = $nc->renewitem($it,$auths[$sysa][2],'12/29/2039');
-   $result = $resp->xpath('//Problem');
-   if (isset($result[0])) {
-      $errors .=  
-      print_r( $it, TRUE). '|'.
-      print_r( strval($result[0]->ErrorCode), TRUE). '|'.
-      print_r( strval($result[0]->ErrorMessage),TRUE).'*';
-    } else {
-    // whatever 
-   }
-  }
-  }
-}
+for($i=0;$i<$renewablec;$i++) {
+    if (isset($_POST['item_'.$i.'_renew']))  {
+        $val = explode(":",$_POST['item_'.$i.'_renew']);
+        $sys = $val[0] ;
+        $requested [$sys][] = $val[1];
+    }
 }
 
-if (count($canceled)) {
-foreach ($canceled as $sysa => $ids) {
-  if (!isset($nca[$sysa])) {
-      $nca[$sysa] = new NCIPc($sysa);
-  }
-  $nc = $nca[$sysa];
-  $nc->set_trace(1);
-  $resp = $nc->authenticate($auths[$sysa][0],$auths[$sysa][1]);
-  $result = $resp->xpath('//Problem');
-  if (isset($result[0])) {
-     $errors .=  
-     print_r( '0',TRUE). '|'.
-     print_r( strval($result[0]->ErrorCode),TRUE). '|'.
-     print_r( strval($result[0]->ErrorMessage),TRUE).'*';
-   }   else {
-  }
-  if (count($ids)) {
-  foreach( $ids as $it) { 
-   //$resp = $nc->renewitem($it,$auths[$sysa][2],'12/29/2039');
-   $resp = $nc->cancelrequestitem($it,$auths[$sysa][2]);
-   $result = $resp->xpath('//Problem');
-   if (isset($result[0])) {
-      $errors .=  
-      print_r( $it, TRUE). '|'.
-      print_r( strval($result[0]->ErrorCode), TRUE). '|'.
-      print_r( strval($result[0]->ErrorMessage),TRUE).'*';
-    } else {
-    // whatever 
-   }
-  }
-  }
-}
-}
 
+renews($requested,$auths);
+cancels($canceled,$auths,$canceledt,$canceledtt);
 
 if ($errors) {
    setcookie('pimessage', $errors, 0, '/', $_SERVER['SERVER_NAME']);
-   //setcookie("pimessage", $errors);
- //header("Location: ". $_SERVER['HTTP_REFERER']);
- //exit(0);
 }
- //setcookie('pimessage', "No errors", 0, '/', '.cornell.edu');
- //setcookie($renewsessionname, $renewsession, 0, '/', '.cornell.edu');
  setcookie('renewuser', $netid, 0, '/', $_SERVER['SERVER_NAME']);
  header("Location: ". $_SERVER['HTTP_REFERER']);
  exit(0);
@@ -175,4 +156,115 @@ echo "<input type=hidden name=ImportData value=\"$data\r\n\"/>\n";
 echo "</form>";
 echo "</body>";
 echo "</html>";
+}
+
+
+function renews($requested,$auths) { 
+global $nca;
+global $nciptypes;
+global $ncipservers;
+global $errors;
+
+if (count($requested)) {
+    foreach ($requested as $sysa => $ids) {
+        if (!isset($nca[$sysa])) {
+            $classname = $nciptypes[$sysa];
+            $ncp = $ncipservers[$sysa];
+            $nca[$sysa] = new $classname($sysa,$ncp);
+        }
+     $nc = $nca[$sysa];
+     $nc->set_trace(1);
+     $nc->set_system($sysa);
+     //$resp = $nc->lookupuser($auths[$sysa][0],$auths[$sysa][1],$auths[$sysa][2],$auths[$sysa][3]);
+     // print_r($resp);
+    }
+}
+
+if (count($requested)) {
+foreach ($requested as $sysa => $ids) {
+  if (!isset($nca[$sysa])) {
+      $classname = $nciptypes[$sysa];
+      $ncp = $ncipservers[$sysa];
+      $nca[$sysa] = new $classname($sysa,$ncp);
+  }
+  $nc = $nca[$sysa];
+  $nc->set_trace(1);
+  $nc->set_system($sysa);
+  $resp = $nc->authenticate($auths[$sysa][0],$auths[$sysa][1],$auths[$sysa][2],$auths[$sysa][3]);
+  $result = $resp->xpath('//Problem');
+  if (isset($result[0])) {
+     $errors .=
+     print_r( '0',TRUE). '|'.
+     print_r( strval($result[0]->ErrorCode),TRUE). '|'.
+     print_r( strval($result[0]->ErrorMessage),TRUE).'*';
+   }   else {
+  }
+
+  if (count($ids)) {
+  foreach( $ids as $it) {
+   $resp = $nc->renewitem($it,$auths[$sysa][2],'12/29/2039');
+   $result = $resp->xpath('//Problem');
+   if (isset($result[0])) {
+      $errors .=
+      print_r( $it, TRUE). '|'.
+      print_r( strval($result[0]->ErrorCode), TRUE). '|'.
+      print_r( strval($result[0]->ErrorMessage),TRUE).'*';
+    } else {
+    // whatever
+   }
+  }
+  }
+}
+}
+}
+
+function cancels($canceled,$auths,$canceledt,$canceledtt) {
+global $nca;
+global $nciptypes;
+global $ncipservers;
+global $errors;
+
+if (count($canceled)) {
+foreach ($canceled as $sysa => $ids) {
+  if (!isset($nca[$sysa])) {
+      $classname = $nciptypes[$sysa];
+      $ncp = $ncipservers[$sysa];
+      $nca[$sysa] = new $classname($sysa,$ncp);
+  }
+  $nc = $nca[$sysa];
+  $nc->set_system($sysa);
+  $nc->set_trace(1);
+  $resp = $nc->authenticate($auths[$sysa][0],$auths[$sysa][1],$auths[$sysa][2],$auths[$sysa][3]);
+  $result = $resp->xpath('//Problem');
+  if (isset($result[0])) {
+     $errors .=
+     print_r( '0',TRUE). '|'.
+     print_r( strval($result[0]->ErrorCode),TRUE). '|'.
+     print_r( strval($result[0]->ErrorMessage),TRUE).'*';
+   }   else {
+  }
+  if (count($ids)) {
+  $cid = 0;
+  foreach( $ids as $it) {
+   if ($canceledtt[$sysa][$cid] == 'R')
+     { 
+        $resp = $nc->cancelrecallitem($it,$auths[$sysa][2],$canceledt[$sysa][$cid],$canceledtt[$sysa][$cid]);
+     }
+   else 
+     $resp = $nc->cancelrequestitem($it,$auths[$sysa][2],$canceledt[$sysa][$cid],$canceledtt[$sysa][$cid]);
+   $cid++;
+   $result = $resp->xpath('//Problem');
+   var_dump($result);
+   if (isset($result[0])) {
+      $errors .=
+      print_r( $it, TRUE). '|'.
+      print_r( strval($result[0]->ErrorCode), TRUE). '|'.
+      print_r( strval($result[0]->ErrorMessage),TRUE).'*';
+    } else {
+    // whatever
+   }
+  }
+  }
+}
+}
 }
