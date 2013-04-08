@@ -5,8 +5,9 @@ $dest='http://www.refworks.com/express/ExpressImport.asp?vendor=cornell.edu&filt
 $nciptypes['voyager'] = 'NCIPcv3';
 $ncipservers['voyager'] =  'http://es287-dev.library.cornell.edu:8080/voyager/NCIPResponder';
 
-$nciptypes['illiad'] = 'NCIPcv1';
-$ncipservers['illiad'] =  'http://catalog.library.cornell.edu:8080/illiadncip/ncipToolkit';
+$nciptypes['illiad'] = 'NCIPcv4';
+# this is a noop -- not used.
+$ncipservers['illiad'] =  'http://catalog-test.library.cornell.edu:8080/illiadncip/ncipToolkit';
 
 $renewsessionname = $_COOKIE['renewsession'];
 $renewsession = $_COOKIE[$_COOKIE['renewsession']];
@@ -77,6 +78,7 @@ include_once("NCIPc.php");
 include_once("NCIPcv1.php");
 include_once("NCIPcv2.php");
 include_once("NCIPcv3.php");
+include_once("NCIPcv4.php");
 $pid = $_POST['pid'];
 $sn = $_POST['sn'];
 $bc = $_POST['bc'];
@@ -89,6 +91,10 @@ fwrite($handle,$netid);
 fclose($handle);
 $auths = array('illiad' => array($netid,$netid,$netid,$netid), 'voyager' => array($bc,$sn,$inid,$pid));
 $nca = array();
+$canceled   = array();
+$canceledt  = array();
+$canceledtt = array();
+$requested = array();
 
 $errors = '';
 
@@ -98,8 +104,13 @@ for($i=0;$i<$cancelc;$i++) {
        $val = explode(":",$_POST['item_'.$i.'_cancel']);
        $sys = $val[0] ;
        $canceled [$sys][] = $val[1]; 
-       $canceledt [$sys][] = $val[3];
-       $canceledtt [$sys][] = $val[4];
+       if ($sys != 'illiad') {
+         $canceledt [$sys][] = $val[3];
+         $canceledtt [$sys][] = $val[4];
+       } else {
+         $canceledt [$sys][] = $val[1];
+         $canceledtt [$sys][] = 'R';
+       }
     }
 }
 
@@ -116,8 +127,11 @@ renews($requested,$auths);
 cancels($canceled,$auths,$canceledt,$canceledtt);
 
 if ($errors) {
-   setcookie('pimessage', $errors, 0, '/', $_SERVER['SERVER_NAME']);
+   //setcookie('pimessage', $errors, 0, '/', $_SERVER['SERVER_NAME']);
+} else {
+   //setcookie('pimessage', '', 0, '/', $_SERVER['SERVER_NAME']);
 }
+ setcookie('pimessage', '', 0, '/', $_SERVER['SERVER_NAME']);
  setcookie('renewuser', $netid, 0, '/', $_SERVER['SERVER_NAME']);
  header("Location: ". $_SERVER['HTTP_REFERER']);
  exit(0);
