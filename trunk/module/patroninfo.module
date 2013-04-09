@@ -239,6 +239,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			          if (isset($pima["$item->iid"])) {$msg = $pima["$item->iid"][2];} 	
 			          }
 			          if (!($item->system == 'borrowdirect') && !($disabled) ) { 
+                                    if (($item->system == 'illiad' && $item->ra == 'Yes') || ($item->system != 'illiad')) { 
 				    $k ='item_'.$cindex .'_renew'; 
                                     $form[$k] = array(
                                         '#id'=> $k,
@@ -246,6 +247,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                                         '#type'=> 'checkbox',
                                         '#return_value' => $item->system . ':' . ($item->system == 'illiad' ? $item->ii:$item->iid),
                                     ) ;
+                                    }
 			      $r = drupal_render($form[$k]);
                               } else {
                                   if (!$disabled) {
