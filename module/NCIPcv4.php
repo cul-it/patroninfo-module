@@ -273,7 +273,6 @@ class NCIPcv4 extends NCIPvx {
     $buf2 = file_get_contents($request);
     if ($this->get_trace()) $this->general($buf2);
     $doc = json_decode($buf2);
-    var_dump($doc);
     if (empty($doc)) {
        $doc = new SimpleXmlElement(
          "<Problem><ErrorCode>500</ErrorCode><ErrorMessage>Communication Error</ErrorMessage></Problem>", LIBXML_NOCDATA);
