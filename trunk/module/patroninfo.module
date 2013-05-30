@@ -161,34 +161,34 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
 			    '#type'  => 'hidden',
 			    '#value'  => $netid,
 			   );
- 			   $form['cbott'] = array(
-			    '#id'  => 'cbotton',
-			    '#name'  => 'cbotton',
-			    '#type'  => 'button',
-			    '#button_type'  => 'button',
-			    '#value'  => t('Export marked items'),
-			    );
- 			   $form['cbotta'] = array(
-			    '#id'  => 'cbottona',
-			    '#name'  => 'cbottona',
-			    '#type'  => 'button',
-			    '#button_type'  => 'button',
-			    '#value'  => t('Export All items'),
-			    );
- 			   $form['submit'] = array(
-			    '#id'  => 'cbottonc',
-			    '#name'  => 'cbottonc',
-			    '#type'  => 'submit',
-			    '#value'  => t('Renew marked items'),
-			    '#button_type'  => 'button',
-			    );
- 			   $form['xsubmit'] = array(
-			    '#id'  => 'cbottond',
-			    '#name'  => 'cbottond',
-			    '#type'  => 'submit',
-			    '#value'  => t('Renew all voyager items'),
-			    '#button_type'  => 'button',
-			    );
+                           $form['cbott'] = array(
+                            '#id'  => 'cbotton',
+                            '#name'  => 'cbotton',
+                            '#type'  => 'button',
+                            '#button_type'  => 'button',
+                            '#value'  => t('Export Marked Items'),
+                            );
+                           $form['cbotta'] = array(
+                            '#id'  => 'cbottona',
+                            '#name'  => 'cbottona',
+                            '#type'  => 'button',
+                            '#button_type'  => 'button',
+                            '#value'  => t('Export All Items'),
+                            );
+                           $form['xsubmit'] = array(
+                            '#id'  => 'cbottond',
+                            '#name'  => 'cbottond',
+                            '#type'  => 'submit',
+                            '#value'  => t('Renew All Voyager Items'),
+                            '#button_type'  => 'button',
+                            );
+                           $form['submit'] = array(
+                            '#id'  => 'cbottonc',
+                            '#name'  => 'cbottonc',
+                            '#type'  => 'submit',
+                            '#value'  => t('Renew Marked Items'),
+                            '#button_type'  => 'button',
+                            );
 			  if (user_access(OTHER_USER)) {
  			   $form['cbottb'] = array(
 			    '#id'  => 'cbottonb',
@@ -505,23 +505,24 @@ function _patroninfo_add_local() {
    $boiler = '
     $(document).ready(function(){ 
                       $("#pi-tabs > ul").tabs();
-	              $("#cbottonc").val("Renew marked items");
+	              $("#cbottonc").val("Renew Marked Items");
 		      $(".ui-tabs-nav > li > a").bind("click",function(event) 
                       {
                       var t = event.target.textContent;
+                      if (!t) t = event.target.innerText;
                       if (t.match("Pending")){
 			$("#cbottona").hide();
-			$("#cbotton").hide();
+			$("#cbotton").show();
 			$("#cbottond").hide();
-			$("#cbottonc").val("Cancel marked items");
+			$("#cbottonc").val("Cancel Marked Items");
 			$("#cbottonc").show();
                       } 
                       if (t.match("Available")){
 			$("#cbottond").hide();
 			$("#cbottona").hide();
-			$("#cbottond").hide();
 			$("#cbotton").hide();
-			$("#cbottonc").val("Cancel marked items");
+			$("#cbottonc").val("Cancel Marked Items");
+			$("#cbottonc").show();
                       } 
                       if (t.match("Fines") || t.match("Notices")){
 			$("#cbottona").hide();
@@ -535,7 +536,7 @@ function _patroninfo_add_local() {
 			$("#cbotton").show();
 			$("#cbottond").show();
 			$("#cbottonc").show();
-			$("#cbottonc").val("Renew marked items");
+			$("#cbottonc").val("Renew Marked Items");
                       } 
                       }
                       );

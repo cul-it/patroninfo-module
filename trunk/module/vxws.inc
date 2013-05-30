@@ -2,7 +2,7 @@
 // some urls are used to POST, or DELETE,
 // and it is important to NOT let redirect happen from http to https
 function _vxws() {
-$vxwsbase="https://catalog-test.library.cornell.edu";
+$vxwsbase="https://catalog.library.cornell.edu";
 $vxwsport="";
 $vxws="$vxwsbase$vxwsport";
 return $vxws;
