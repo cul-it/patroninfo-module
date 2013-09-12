@@ -1,0 +1,60 @@
+#pi-tabs { 
+	width: 100%;
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+#pi-tabs ul { 
+/*
+        border-bottom: 1px solid #696969;
+*/
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+#pi-tabs ul li { 
+	list-style: none;
+	margin-left: 0;
+	margin-bottom: 0;
+	padding-bottom: 0;
+	padding-left: 1em;
+	text-indent: 0;
+}
+.views-tabs {
+/*
+**
+**        position:absolute;
+**        margin-left: -20em;
+*/        margin-top: 10em;
+}
+/*
+** Floating header for divheader.js
+*/
+div.sticky-header {
+  margin-top: 0;
+  background: #fff;
+}
+
+#renewform {}
+
+#renewform #frag-0,
+#renewform  #frag-1, 
+#renewform #frag-2, 
+#renewform #frag-3, 
+#renewform #frag-4 {height:auto; border:5px solid #bbb; width:740px;}
+
+#pi-tabs ul.ui-tabs-nav li {list-style:none;background:none;}
+
+#pi-tabs ul.ui-tabs-nav a {border:none; background:none; padding:0;} 
+#pi-tabs ul.ui-tabs-nav a span {display:block; padding:3px 8px;} 
+#pi-tabs ul.ui-tabs-nav li.ui-tabs-selected a span {background:#bbb;}
+
+#pi-tabs ul.ui-tabs-nav a {background:#ccc;}
+#pi-tabs ul.ui-tabs-nav a:hover,
+#pi-tabs ul.ui-tabs-nav a span:hover {border-bottom:none; background:#bbb; background-image:none;}
+
+#renewform thead th {color:#b31b1b; font-weight:bold; font-size:18px;}
+
+#pi-tabs tr.even {background:transparent;}
+
+#pi-tabs input {}
+
+#node-1228 {display:none;}

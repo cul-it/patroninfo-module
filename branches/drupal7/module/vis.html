@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<html>
+  <script src="/webvision/misc/jquery.js" type="text/javascript"></script>
+  <script src="js/jquery.corner.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+  $(".cite").click(function(event) {
+     $("#patroninfo-export-box").corner();
+     alert("link and id" + event.currentTarget.parentNode.id+'-link and '+event.currentTarget.parentNode.id);
+     refbox(event.currentTarget.parentNode.id+'-link',event.currentTarget.parentNode.id);
+   });
+  $("#patroninfo-export-box").hide();
+  $("#togglecb").click( function(event) {
+    $("#patroninfo-export-box").hide();
+    return true;
+   });
+});
+</script>
+<script type="text/javascript">
+function refbox(d,t){
+     $("#patroninfo-export-box").show();
+     $("#rname").text($("#"+t+" span:first-child ").text());
+     $("#dest") .attr(  "href" ,$("#"+d+"-ref").attr("href"));
+     $("#dest2").attr(  "href" ,$("#"+d+"-ris").attr("href"));
+}
+</script>
+<style>
+hr{color:#717171; height:1px;}
+.tbox{ 
+			 font-size: 10px;
+			 width:114px;
+			 display:inline;
+}
+.mbox{ 
+			 font-size: 10px;
+			 width:114px;
+			 display:inline;
+			 text-align:center;
+}
+.linea   {
+			 border: 1px;
+	                 border-style:solid;
+			 border-color: gray;
+			 text-align:left;
+			 float:left;
+}
+.bleft{ 
+			 font-size: 8px;
+			 width:96px;
+			 text-align:left;
+			 display:inline;
+			 float:left;
+}
+.bright{ 
+			 font-size: 8px;
+			 width:18px;
+			 text-align:right;
+			 display:inline;
+			 float:right;
+}
+#togglecb{ 
+			 font-size: 10px;
+}
+#patroninfo-export-box { 
+                         left:264px;
+                         top:157px;
+			 font-size: 10px;
+			 border: 3px;
+	                 border-style:solid;
+			 border-color: gray;
+                         padding: 1px 0 3px 3px !important;
+			 background-color: efefef;
+                         opacity: 1.0; 
+                         width: 114px; 
+                         height: 132px; 
+                         z-index: 100; 
+                         display: block; 
+                         visibility: visible; 
+			 align:center;
+}
+</style>
+  <body>
+    <h1>This is a simulation of a my account page.</h1>
+    <p>
+      <br/>
+      <div class="title-container">
+      <div class="title" id="title1" );"><span>Title1</span><span class="cite" style="font-size: 10px">Cite</span>
+      <div class="patroninfo-hide">
+          <a id="title1-link-ref" target="_refworks" href="/webvision/sites/all/modules/patroninfo/citation.php?ou_aulast=A.+genius&amp;ou_genre=Book&amp;ou_title=a+book&amp;ou_isbn=1234"></a>
+          <a id="title1-link-ris" target="_refworks" href="/webvision/sites/all/modules/patroninfo/ris.php?ou_aulast=A.+genius&amp;ou_genre=Book&amp;ou_title=a+book&amp;ou_isbn=1234"></a>
+      </div>
+      </div>
+      </div>
+      <div class="title-container">
+      <div class="title" id="title2" );"><span>Title2</span><span class="cite" style="font-size: 10px">Cite</span>
+      <div class="patroninfo-hide">
+          <a id="title2-link-ref" target="_refworks" href="/webvision/sites/all/modules/patroninfo/citation.php?ou_aulast=A.+genius&amp;ou_genre=Book&amp;ou_title=a+book+2&amp;ou_isbn=1234"></a>
+          <a id="title2-link-ris" target="_refworks" href="/webvision/sites/all/modules/patroninfo/ris.php?ou_aulast=A.+genius&amp;ou_genre=Book&amp;ou_title=a+book+2&amp;ou_isbn=1234"></a>
+      </div>
+      </div>
+      </div>
+    </p>
+    <div id="patroninfo-export-box">
+        <div class="tbox">
+            <div class="bleft">Cite/Export
+                <span id="rname"></span>
+            </div>
+            <div class="bright">
+                <input type="image" src="close-16x16.png" id="togglecb" value="Close"/>
+            </div>
+        </div>
+        <br/>
+        <hr/>
+        <div class="mbox">
+            <a class="linea" id="dest" href="">Save to refworks</a>
+            <br/>
+            <hr/>
+            <a class="linea" id="dest2" href="">Save as RIS</a>
+            <br/>
+            <hr/>
+            <a class="linea" id="dest3" href="">Save as Bibtex</a>
+            <br/>
+            <hr/>
+        </div>
+    </div>
+  </body>
+</html>

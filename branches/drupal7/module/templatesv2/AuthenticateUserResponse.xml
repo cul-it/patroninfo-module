@@ -1,0 +1,27 @@
+<NCIPMessage version="http://www.niso.org/ncip/v1_0/imp1/dtd/ncip_v1_0.dtd">
+        <AuthenticateUserResponse>
+                <ResponseHeader>
+                        <FromAgencyId>
+                                <UniqueAgencyId>
+                                        <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                        <Value>Cornell University</Value>
+                                </UniqueAgencyId>
+                        </FromAgencyId>
+                        <ToAgencyId>
+                                <UniqueAgencyId>
+                                        <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                        <Value>Cornell University</Value>
+                                </UniqueAgencyId>
+                        </ToAgencyId>
+                </ResponseHeader>
+                <UniqueUserId>
+                        <UniqueAgencyId>
+                                <Scheme>http://128.151.244.132:8080/ncip/schemes/AgencyScheme.scm</Scheme>
+                                <Value>University of Rochester</Value>
+                        </UniqueAgencyId>
+                        <UserIdentifierValue>%UIV%</UserIdentifierValue>
+                </UniqueUserId>
+        </AuthenticateUserResponse>
+</NCIPMessage>
+
+

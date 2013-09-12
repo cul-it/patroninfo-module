@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE NCIPMessage PUBLIC "-//NISO//NCIP DTD Version 1//EN" "http://xml.coverpages.org/NCIP-v10a-DTD.txt">
+<NCIPMessage version="http://www.niso.org/ncip/v1_0/impl/xsd/ncip_version.dtd">
+        <LookupUser>
+                <InitiationHeader>
+                        <FromAgencyId>
+                                <UniqueAgencyId>
+                                        <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                        <Value>Cornell University</Value>
+                                </UniqueAgencyId>
+                        </FromAgencyId>
+                        <ToAgencyId>
+                                <UniqueAgencyId>
+                                        <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                        <Value>Cornell University</Value>
+                                </UniqueAgencyId>
+                        </ToAgencyId>
+                </InitiationHeader>
+                <UniqueUserId>
+                        <UniqueAgencyId>
+                                <Scheme>http://128.151.244.132:8080/NCIPToolkit/NCIPschemes/AgencyScheme.scm</Scheme>
+                                <Value>Cornell University</Value>
+                        </UniqueAgencyId>
+                        <UserIdentifierValue>%USER_ID%</UserIdentifierValue>
+                </UniqueUserId>
+                <LoanedItemsDesired />
+                <RequestedItemsDesired />
+                <UserFiscalAccountDesired />
+                <UserElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm</Scheme>
+                        <Value>Block Or Trap</Value>
+                </UserElementType>
+                <UserElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm</Scheme>
+                        <Value>User Address Information</Value>
+                </UserElementType>
+                <UserElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm</Scheme>
+                        <Value>Visible User Id</Value>
+                </UserElementType>
+		<!--
+                <UserElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm</Scheme>
+                        <Value>Name Information</Value>
+                </UserElementType>
+                <UserElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm</Scheme>
+                        <Value>Date of Birth</Value>
+                </UserElementType>
+                <UserElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm</Scheme>
+                        <Value>Language</Value>
+                </UserElementType>
+                <UserElementType>
+                        <Scheme>http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm</Scheme>
+                        <Value>User Privilege</Value>
+                </UserElementType>
+		-->
+        </LookupUser>
+</NCIPMessage>
+

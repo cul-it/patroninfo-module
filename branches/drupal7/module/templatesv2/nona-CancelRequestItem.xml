@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<NCIPMessage version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+    <CancelRequestItem>
+        <AuthenticationInput>
+            <AuthenticationInputData>%BARCODE%</AuthenticationInputData>
+            <AuthenticationDataFormatType>text</AuthenticationDataFormatType>
+            <AuthenticationInputType>Username</AuthenticationInputType>
+        </AuthenticationInput>
+        <AuthenticationInput>
+            <AuthenticationInputData>%SURNAME%</AuthenticationInputData>
+            <AuthenticationDataFormatType>text</AuthenticationDataFormatType>
+            <AuthenticationInputType>Password</AuthenticationInputType>
+        </AuthenticationInput>
+         <RequestId>
+            <RequestIdentifierValue>%REQUESTID%</RequestIdentifierValue>
+        </RequestId>
+        <ItemId>
+            <ItemIdentifierValue>%ITEMID%</ItemIdentifierValue>
+        </ItemId>
+        <RequestType 
+     Scheme="http://www.niso.org/ncip/v1_0/imp1/schemes/requesttype/requesttype.scm">%REQTYPE%</RequestType>
+    </CancelRequestItem>
+</NCIPMessage>
