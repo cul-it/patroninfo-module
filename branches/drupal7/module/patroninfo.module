@@ -16,10 +16,10 @@ define('CONFIGURE_ILS', 'configure ils api feeds');
  */
 function patroninfo_block_info() {
   // TODO Rename block deltas (e.g. delta-0) to readable strings.
-  $blocks['delta-0']['info'] = t('PatronInfo');
-  $blocks['delta-0']['cache'] = BLOCK_NO_CACHE;
-  $blocks['delta-1']['info'] = t('PatronInfo Renew');
-  $blocks['delta-1']['cache'] = BLOCK_NO_CACHE;
+  $blocks['patroninfo']['info'] = t('PatronInfo');
+  $blocks['patroninfo']['cache'] = BLOCK_NO_CACHE;
+  $blocks['patroninfo-renew']['info'] = t('PatronInfo Renew');
+  $blocks['patroninfo-renew']['cache'] = BLOCK_NO_CACHE;
   return $blocks;
 }
 
@@ -29,7 +29,7 @@ function patroninfo_block_info() {
 function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings.
   switch ($delta) {
-    case 'delta-0':
+    case 'patroninfo':
       views_include("tabs");
       views_add_css('admin');
       _patroninfo_add_local();
@@ -244,7 +244,7 @@ function patroninfo_block_view($delta) {
             }
             if ($due == $today) {
               // the space makes the string sort to the top -- so leave it there.
-              // the span is for anyone who wants to style things due today.	
+              // the span is for anyone who wants to style things due today.
               if (!empty($item->odt)) {
                 $time = ' by ' . $item->odt;
               }
@@ -425,7 +425,7 @@ function patroninfo_block_view($delta) {
         setcookie("callback", "/apache2-default/webvision/xaboutme");
         drupal_goto($dest);
       }
-    case 'delta-1':
+    case 'patroninfo-renew':
       $blocks['content'] .= drupal_get_form('patroninfo_renewform');
       return $blocks;
   } // delta;
@@ -464,8 +464,10 @@ function patroninfo_menu() {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * administration settings for patroningo
+ * @param  array $form       form array
+ * @param  array $form_state state of form
+ * @return array             modified form
  */
 function patroninfo_admin_settings($form, &$form_state) {
   $form['patroninfo_template'] = array(
@@ -489,6 +491,10 @@ function patroninfo_admin_settings($form, &$form_state) {
 /**
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
+ */
+/**
+ * [patroninfo_permission description]
+ * @return [type] [description]
  */
 function patroninfo_permission() {
   return array(
@@ -629,6 +635,12 @@ function _patroninfo_add_local() {
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
  */
+/**
+ * [patroninfo_list_submit description]
+ * @param  [type] $form       [description]
+ * @param  [type] $form_state [description]
+ * @return [type]             [description]
+ */
 function patroninfo_list_submit($form, &$form_state) {
 
   $gnet = $form_state['values']['patroninfo_list'];
@@ -645,12 +657,21 @@ function patroninfo_list_submit($form, &$form_state) {
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
  */
+/**
+ * [patroninfo_process description]
+ * @return [type] [description]
+ */
 function patroninfo_process() {
 }
 
 /**
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
+ */
+/**
+ * [patroninfo_renewform description]
+ * @param  [type] $form [description]
+ * @return [type]       [description]
  */
 function patroninfo_renewform($form) {
   $form = patroninfo_list();
@@ -660,6 +681,12 @@ function patroninfo_renewform($form) {
 /**
  * @todo Please document this function.
  * @see http://drupal.org/node/1354
+ */
+/**
+ * [patroninfo_list description]
+ * @param  [type] $form       [description]
+ * @param  [type] $form_state [description]
+ * @return [type]             [description]
  */
 function patroninfo_list($form, &$form_state) {
   $gnet = $_REQUEST['patroninfo_list'] ? $_REQUEST['patroninfo_list'] : $_SESSION['gnet'];
@@ -727,7 +754,7 @@ function patroninfo_list($form, &$form_state) {
         }
         if ($due == $today) {
           // the space makes the string sort to the top -- so leave it there.
-          // the span is for anyone who wants to style things due today.	
+          // the span is for anyone who wants to style things due today.
           if (!empty($item->odt)) {
             $time = ' by ' . $item->odt;
           }
