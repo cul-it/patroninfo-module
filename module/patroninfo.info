@@ -1,5 +1,5 @@
 ; $Id: patroninfo.info 15 2009-01-22 15:04:13Z es287 $
 name = PatronInfo
 description = show information about a patron
-core = 6.x
+core = 7.x
 php = 5.2

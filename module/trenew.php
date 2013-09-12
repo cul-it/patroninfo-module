@@ -6,7 +6,7 @@ $cdir = getcwd();
 $boodir = '/var/www/apache2-default/webvision';
 chdir($boodir);
 set_include_path(get_include_path() . PATH_SEPARATOR . $boodir);
-include_once ("./includes/bootstrap.inc");
+include_once DRUPAL_ROOT . "/includes/bootstrap.inc";
 drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
 chdir($cdir);
 $sess = sess_read($renewsession);
@@ -16,7 +16,7 @@ foreach ($var->items as $item) {
   print_r("Item is <br/>");
   print_r($item);
 }
-include_once ("NCIPc.php");
+include_once DRUPAL_ROOT . '/' . "NCIPc.php";
 $sn = $_POST['sn'];
 $bc = $_POST['bc'];
 $inid = $_POST['inid'];
