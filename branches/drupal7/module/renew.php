@@ -20,7 +20,7 @@ if (is_dir('/libweb/sites/wwwdev.library.cornell.edu/htdocs')) {
 }
 chdir($boodir);
 set_include_path(get_include_path() . PATH_SEPARATOR . $boodir);
-include_once ("./includes/bootstrap.inc");
+include_once DRUPAL_ROOT . "/includes/bootstrap.inc";
 session_name($renewsessionname);
 drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
 chdir($cdir);
@@ -40,21 +40,21 @@ if (isset($_POST['cbottond'])) {
 if (isset($_POST['cbottono'])) {
   header("Location: /index");
   unset($_COOKIE['verify_netid']);
-  setcookie('verify_netid', "invalid", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('verify_netid', "invalid", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   unset($_COOKIE['netid']);
-  setcookie('netid', "invalid", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('netid', "invalid", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   unset($_COOKIE['cuwltgttime']);
-  setcookie('cuwltgttime', "invalid", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('cuwltgttime', "invalid", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   unset($_COOKIE['CUWALastWeblogin']);
-  setcookie('CUWALastWeblogin', "invalid", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('CUWALastWeblogin', "invalid", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   unset($_COOKIE['cuweblogin2']);
-  setcookie('cuweblogin2', "", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('cuweblogin2', "", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   unset($_COOKIE['__utma']);
-  setcookie('__utma', "", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('__utma', "", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   unset($_COOKIE['__utmb']);
-  setcookie('__utmb', "", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('__utmb', "", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   unset($_COOKIE['__utmc']);
-  setcookie('__utmc', "", time() - 3600 * 25, '/', '.cornell.edu');
+  setcookie('__utmc', "", REQUEST_TIME - 3600 * 25, '/', '.cornell.edu');
   exit(0);
 }
 
@@ -75,11 +75,11 @@ if (isset($_POST['cbotton'])) {
   sendthem($dest, $data);
   exit(0);
 }
-include_once ("NCIPc.php");
-include_once ("NCIPcv1.php");
-include_once ("NCIPcv2.php");
-include_once ("NCIPcv3.php");
-include_once ("NCIPcv4.php");
+include_once DRUPAL_ROOT . '/' . "NCIPc.php";
+include_once DRUPAL_ROOT . '/' . "NCIPcv1.php";
+include_once DRUPAL_ROOT . '/' . "NCIPcv2.php";
+include_once DRUPAL_ROOT . '/' . "NCIPcv3.php";
+include_once DRUPAL_ROOT . '/' . "NCIPcv4.php";
 $pid = $_POST['pid'];
 $sn = $_POST['sn'];
 $bc = $_POST['bc'];

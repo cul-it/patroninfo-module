@@ -12,9 +12,9 @@ if (is_dir('/libweb/sites/www.test2.library.cornell.edu/htdocs')) {
 }
 chdir($boodir);
 set_include_path(get_include_path() . PATH_SEPARATOR . $boodir);
-include_once ("./includes/bootstrap.inc");
+include_once DRUPAL_ROOT . "/includes/bootstrap.inc";
 if (1) {
-  include_once ("./includes/session.inc");
+  include_once DRUPAL_ROOT . "/includes/session.inc";
   // parts of drupal_bootstrap
   drupal_unset_globals();
   // Start a page timer:
@@ -22,11 +22,11 @@ if (1) {
   // Initialize the configuration
   conf_init();
   // Initialize the default database.
-  require_once './includes/database.inc';
+  require_once DRUPAL_ROOT . '/includes/database.inc';
   db_set_active();
   // Allow specifying alternate lock implementations in settings.php, like
   // those using APC or memcached.
-  require_once variable_get('lock_inc', './includes/lock.inc');
+  require_once DRUPAL_ROOT . '/' . variable_get('lock_inc', './includes/lock.inc');
   lock_init();
 
 
