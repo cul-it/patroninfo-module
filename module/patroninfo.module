@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: patroninfo.module 38 2013-05-30 18:33:27Z es287 $
 /**
  * @file - shows a library patron's data.
  *
