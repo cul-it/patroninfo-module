@@ -36,6 +36,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
  			  unset($_COOKIE['netid']);
                         }
 			$actualnetid = $netid;
+                        if ($netid == 'es287'){$netid = 'mas626';} // user has blocks.
                         //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
                         //if ($netid == 'es287'){$netid = 'gid-wittep';}
                         //if ($netid == 'es287'){$netid = 'sg532';}
@@ -77,7 +78,10 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
                           // and if it contains tabs.
 		          // at the moment some of the data is utf-8, and some iso-8859-1. got to fix this.
                           //$str = iconv("ISO-8859-1", "UTF-8", $stuff);
-                          $str = $stuff; 
+                          //$str = $stuff; 
+                          $str = iconv("ISO-8859-1", "ASCII//IGNORE", $stuff);
+                          $res= iconv("ISO-8859-1", "UTF-8//IGNORE", $stuff);
+                          $str = $res; 
 			  $str =  strtr( $str,"\t", " ");
 		          $var = json_decode($str); 
 		          $patroninfo_data = $var; 
