@@ -17,9 +17,9 @@ define('CONFIGURE_ILS', 'configure ils api feeds');
 function patroninfo_block_info() {
   // TODO Rename block deltas (e.g. delta-0) to readable strings.
   $blocks['patroninfo']['info'] = t('PatronInfo');
-  $blocks['patroninfo']['cache'] = BLOCK_NO_CACHE;
+  $blocks['patroninfo']['cache'] = DRUPAL_NO_CACHE;
   $blocks['patroninfo-renew']['info'] = t('PatronInfo Renew');
-  $blocks['patroninfo-renew']['cache'] = BLOCK_NO_CACHE;
+  $blocks['patroninfo-renew']['cache'] = DRUPAL_NO_CACHE;
   return $blocks;
 }
 
