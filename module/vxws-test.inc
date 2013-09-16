@@ -12,4 +12,3 @@ $vxwsdbid = '1@CORNELLDB20021226150546';
 return $vxwsdbid;
 }
 ?>
-
