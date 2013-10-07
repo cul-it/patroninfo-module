@@ -536,7 +536,7 @@ function _link($label, $class, $link) {
 /**
  * returns a formatted link
  */
-function _format_table($legend, $datad, $col_one, $col_two, $col_three, $clapsed = TRUE) {
+/*function _format_table($legend, $datad, $col_one, $col_two, $col_three, $clapsed = TRUE) {
   $fstitle = $legend . ' (' . sizeof($datad) . ')';
   $bc = theme_table(array(
     $col_one,
@@ -552,7 +552,7 @@ function _format_table($legend, $datad, $col_one, $col_two, $col_three, $clapsed
   //$fieldset = array('#title' => $fstitle, '#collapsible' => FALSE,'#collapsed' => $clapsed, '#value' => $bc);
   return theme('fieldset', $fieldset);
 }
-/**
+*//**
  * returns tabs formatted like primary tabs.
  * ptabs is an array of arrays -- each element is an array of data, and an array of labels.
  * first is array of data, second is array of items, third is just label. eg
