@@ -561,6 +561,7 @@ function _link($label, $class, $link) {
 function _patroninfo_tabs($ptabs) {
   $ul = '<div id="pi-tabs" class="xtabs"><ul>' . "\n";
   $tabn = 0;
+  debug($ptabs);  //jgr25
   foreach ($ptabs as $item) {
     $bc = theme_table($item[1], $item[0], null, $item[2]);
     $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . sizeof($item[0]) . ')</span></a></li>' . "\n";
