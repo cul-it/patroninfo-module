@@ -563,7 +563,13 @@ function _patroninfo_tabs($ptabs) {
   $tabn = 0;
   foreach ($ptabs as $item) {
     debug($item);  //jgr25
-    $bc = theme_table($item[1], $item[0], null, $item[2]);
+    $variables = array(
+      'header' => $item[1],
+      'rows' => $item[0],
+      'caption' => $item[3],
+      );
+    $bc = theme_table($variables); // jgr25
+    //$bc = theme_table($item[1], $item[0], null, $item[2]);
     $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . sizeof($item[0]) . ')</span></a></li>' . "\n";
     $dv .= "<div id=\"frag-$tabn\">" . $bc . '</div>' . "\n";
     $tabn++;
