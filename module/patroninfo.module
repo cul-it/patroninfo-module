@@ -779,8 +779,8 @@ function patroninfo_list($form, &$form_state) {
         );
         $cdatad[] = array($due, $item->tl . t('Location:') . $item->lo . ". $note", '');
         $scdatad[] = array(
-          index => $cindex++,
-          due => $due,
+          'index' => $cindex++,
+          'due' => $due,
         );
       }
       if (($item->status == 'Unfilled') || ($item->status == 'Cancelled')) {
