@@ -227,7 +227,7 @@ function patroninfo_block_view($delta) {
         }
         foreach ($var->items as $item) {
           $modate = $note = '';
-          debug ($item);
+          debug ($item, 'This is an item!');
           if (($item->status == 'chrged') || ($item->status == ' RECEIVED') || ($item->status == 'Received')) {
             if ($item->od == $item->rd) {
               $due = $item->od;
@@ -563,14 +563,13 @@ function _patroninfo_tabs($ptabs) {
   $ul = '<div id="pi-tabs" class="xtabs"><ul>' . "\n";
   $tabn = 0;
   foreach ($ptabs as $item) {
-    debug($item);  //jgr25
     $variables = array(
       'header' => $item[1],
       'rows' => $item[0],
       'caption' => $item[2],
       'attributes' => array(),
       );
-    debug($variables);
+    //debug($variables);
     $bc = theme_table($variables); // jgr25
     //$bc = theme_table($item[1], $item[0], null, $item[2]);
     $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . sizeof($item[0]) . ')</span></a></li>' . "\n";
