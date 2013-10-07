@@ -28,7 +28,7 @@ function patroninfo_block_info() {
  */
 function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings
-  $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices
+  $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
   switch ($delta) {
     case 'patroninfo':
       // views_include("tabs"); jgr25 trial remove for Drupal7
@@ -93,8 +93,8 @@ function patroninfo_block_view($delta) {
         $today = date('Y-m-d');
         $_COOKIE['renewsession'] = session_name();
         __set_cookie_header('renewsession', session_name());
-        $pimessage = $_COOKIE['pimessage'];
-        if (isset($pimessage)) {
+        if (isset($_COOKIE['pimessage'])) {
+          $pimessage = $_COOKIE['pimessage'];
           $pims = explode('*', $pimessage);
           foreach ($pims as $item) {
             $itema = explode("|", $item);
