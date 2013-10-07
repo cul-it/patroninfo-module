@@ -588,6 +588,7 @@ function _patroninfo_add_local() {
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.draggable.js');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.dialog.js');
   $boiler = '
+  jQuery(function( $ ){
     $(document).ready(function(){
                       $("#pi-tabs > ul").tabs();
 	              $("#cbottonc").val("Renew Marked Items");
@@ -626,6 +627,7 @@ function _patroninfo_add_local() {
                       }
                       );
     } );
+});
     ';
 
   drupal_add_js($boiler, array('type' => 'inline', 'scope' => JS_DEFAULT));
