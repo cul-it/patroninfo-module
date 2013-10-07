@@ -830,13 +830,15 @@ function __erase_cookie_header($cookiename) {
   $backdate = date("l, d-M-y H:i:s", ($backtime));
   $tmpstring = $_COOKIE[$cookiename];
   //$tmpstring = urlencode($tmpstring);
-  return ("Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=" . $_SERVER['SERVER_NAME']);
+  drupal_add_http_header("Set-Cookie",
+  "Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=" . $_SERVER['SERVER_NAME']);
 }
 function __set_cookie_header($cookiename, $value) {
   $backtime = mktime() + 36000;
   $backdate = date("l, d-M-y H:i:s", ($backtime));
   $tmpstring = urlencode($value);
-  return ("Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=" . $_SERVER['SERVER_NAME']);
+  drupal_add_http_header("Set-Cookie",
+  "$cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=" . $_SERVER['SERVER_NAME']);
 }
 
 function __build_cite_link(&$item) {
