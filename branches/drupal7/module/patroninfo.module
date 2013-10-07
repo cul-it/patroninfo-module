@@ -67,7 +67,7 @@ function patroninfo_block_view($delta) {
         }
         if (0 && isset($_COOKIE['renewuser'])) {
           $netid = $_COOKIE['renewuser'];
-          drupal_set_header(__erase_cookie_header('renewuser'));
+          __erase_cookie_header('renewuser');
         }
       }
 
@@ -91,7 +91,7 @@ function patroninfo_block_view($delta) {
         $crindex = 0;
         $today = date('Y-m-d');
         $_COOKIE['renewsession'] = session_name();
-        drupal_set_header(__set_cookie_header('renewsession', session_name()));
+        __set_cookie_header('renewsession', session_name());
         $pimessage = $_COOKIE['pimessage'];
         if (isset($pimessage)) {
           $pims = explode('*', $pimessage);
@@ -99,7 +99,7 @@ function patroninfo_block_view($delta) {
             $itema = explode("|", $item);
             $pima[$itema[0]] = $itema;
           }
-          drupal_set_header(__erase_cookie_header('pimessage'));
+          __erase_cookie_header('pimessage');
         }
         $api_blocks = '';
         $rdenied = 'N';
