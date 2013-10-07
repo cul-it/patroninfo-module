@@ -567,6 +567,7 @@ function _patroninfo_tabs($ptabs) {
       'header' => $item[1],
       'rows' => $item[0],
       'caption' => $item[2],
+      'attributes' => array(),
       );
     $bc = theme_table($variables); // jgr25
     //$bc = theme_table($item[1], $item[0], null, $item[2]);
