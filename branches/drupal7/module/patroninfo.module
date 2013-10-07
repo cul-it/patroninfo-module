@@ -33,7 +33,7 @@ function patroninfo_block_view($delta) {
       // views_include("tabs"); jgr25 trial remove for Drupal7
       views_add_css('admin');
       _patroninfo_add_local();
-      $ts = new views_tabset;
+      // $ts = new views_tabset; jgr25 trial remove for Drupal7
       $netid = cu_authenticate();
       if ($_COOKIE['netid']) { // make sure netid is never stale.
         unset($_COOKIE['netid']);
