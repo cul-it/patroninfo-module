@@ -286,8 +286,8 @@ function patroninfo_block_view($delta) {
             //$cdatad[]= array($due,$r.$item->tl . t('Location:').$item->lo.". $note",'');
             $cdatad[] = array($r, $visdue, $item->tl . t('Location:') . $item->lo . ". $note" . __build_cite_link($item) . __build_coins($item), '');
             $scdatad[] = array(
-              index => $cindex++,
-              due => $due,
+              'index' => $cindex++,
+              'due' => $due,
             );
             $cdata .= '<li class=patroninfo-item>' . $item->tl . ' ' . $due . t(' borrowed from ') . $item->lo . '</li>';
           }
