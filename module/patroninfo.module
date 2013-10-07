@@ -30,7 +30,7 @@ function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings.
   switch ($delta) {
     case 'patroninfo':
-      views_include("tabs");
+      // views_include("tabs"); jgr25 trial remove for Drupal7
       views_add_css('admin');
       _patroninfo_add_local();
       $ts = new views_tabset;
