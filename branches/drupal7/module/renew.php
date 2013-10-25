@@ -1,6 +1,10 @@
 <?php
+define('DRUPAL_ROOT', $_SERVER['DOCUMENT_ROOT']);
+$base_url = 'http://'.$_SERVER['HTTP_HOST'];
+require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
+drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
+$cdir = getcwd();
 $data = '';
-
 $dest = 'http://www.refworks.com/express/ExpressImport.asp?vendor=cornell.edu&filter=RefWorks%20Tagged%20Format&encoding=65001';
 $nciptypes['voyager'] = 'NCIPcv3';
 $ncipservers['voyager'] = 'http://es287-dev.library.cornell.edu:8080/voyager/NCIPResponder';
@@ -9,23 +13,6 @@ $nciptypes['illiad'] = 'NCIPcv4';
 # this is a noop -- not used.
 $ncipservers['illiad'] = 'http://catalog-test.library.cornell.edu:8080/illiadncip/ncipToolkit';
 
-$renewsessionname = $_COOKIE['renewsession'];
-$renewsession = $_COOKIE[$_COOKIE['renewsession']];
-$cdir = getcwd();
-//$boodir = '/var/www/html';
-//$boodir = '/var/www/apache2-default/webvision';
-$boodir = '/libweb/sites/www.library.cornell.edu/htdocs';
-if (is_dir('/libweb/sites/wwwdev.library.cornell.edu/htdocs')) {
-  $boodir = '/libweb/sites/wwwdev.library.cornell.edu/htdocs';
-}
-chdir($boodir);
-set_include_path(get_include_path() . PATH_SEPARATOR . $boodir);
-include_once DRUPAL_ROOT . "/includes/bootstrap.inc";
-session_name($renewsessionname);
-drupal_bootstrap(DRUPAL_BOOTSTRAP_SESSION);
-chdir($cdir);
-$sess = sess_read($renewsession);
-session_decode($sess);
 $var = $_SESSION['all_json'];
 $requestc = 0;
 $renewablec = $_POST['item_cindex'];
@@ -36,6 +23,7 @@ if (isset($_POST['cbottond'])) {
   $_POST['item_0_renew'] = 'voyager:all';
 }
 
+chdir($cdir);
 
 if (isset($_POST['cbottono'])) {
   header("Location: /index");
@@ -75,11 +63,11 @@ if (isset($_POST['cbotton'])) {
   sendthem($dest, $data);
   exit(0);
 }
-include_once DRUPAL_ROOT . '/' . "NCIPc.php";
-include_once DRUPAL_ROOT . '/' . "NCIPcv1.php";
-include_once DRUPAL_ROOT . '/' . "NCIPcv2.php";
-include_once DRUPAL_ROOT . '/' . "NCIPcv3.php";
-include_once DRUPAL_ROOT . '/' . "NCIPcv4.php";
+include_once $cdir . '/' . "NCIPc.php";
+include_once $cdir . '/' . "NCIPcv1.php";
+include_once $cdir . '/' . "NCIPcv2.php";
+include_once $cdir .  '/' . "NCIPcv3.php";
+include_once $cdir . '/' . "NCIPcv4.php";
 $pid = $_POST['pid'];
 $sn = $_POST['sn'];
 $bc = $_POST['bc'];
@@ -280,3 +268,4 @@ function cancels($canceled, $auths, $canceledt, $canceledtt) {
     }
   }
 }
+?>

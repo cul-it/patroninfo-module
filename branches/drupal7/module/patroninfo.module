@@ -119,12 +119,6 @@ function patroninfo_block_view($delta) {
         // form tree begins.
         // because we render 'manually', some stuff does not show up.
         // YOU BETTER MAKE SURE THIS FORM DOES NOT CACHE.
-        $form['#type'] = 'form';
-        $form['#id'] = 'renewform';
-        $form['#name'] = 'renewform';
-        $form['#method'] = 'post';
-        $form['#action'] = url('sites/all/modules/patroninfo/renew.php');
-        $form['#attributes'] = array('enctype' => 'multipart/form-data',);
         if (user_access(OTHER_USER)) {
           $form['other_user'] = array(
             '#id' => 'other_user',
@@ -225,6 +219,13 @@ function patroninfo_block_view($delta) {
         if ($rdenied == 'Y') {
           $rblock_msg = "You are blocked from renewing.$api_blocks";
         }
+        $form['#type'] = 'form';
+        $form['#id'] = 'renewform';
+        $form['#name'] = 'renewform';
+        $form['#method'] = 'post';
+        $form['#action'] = url('sites/all/modules/custom/patroninfo/renew.php');
+        $form['#attributes'] = array('enctype' => 'multipart/form-data',);
+        //$hidden .= drupal_render($form);
         foreach ($var->items as $item) {
           $modate = $note = '';
           if (($item->status == 'chrged') || ($item->status == ' RECEIVED') || ($item->status == 'Received')) {
@@ -401,7 +402,7 @@ function patroninfo_block_view($delta) {
         $p5 = array($ndatad, array(t('Date'), t('Item and message'), t('At')), t('Notices'));
         $form['panels'] = array(
           '#type' => 'markup',
-          '#value' => _patroninfo_tabs(array($p1, $p2, $p3, $p4, $p5)),
+          '#markup' => _patroninfo_tabs(array($p1, $p2, $p3, $p4, $p5)),
         );
         $form['item_cindex'] = array(
           '#name' => 'item_cindex',
@@ -413,8 +414,8 @@ function patroninfo_block_view($delta) {
           '#type' => 'hidden',
           '#value' => count($odatad),
         );
-        //$blocks['content'] .=   _patroninfo_tabs(array($p1,$p2,$p3,$p4,$p5));
-        $blocks['content'] .= drupal_render_form('renewform', $form);
+        // no such call in drupal 7 $blocks['content'] .= drupal_render_form('renewform', $form);
+        $blocks['content']  .= drupal_render($form); 
         //$blocks['content'] .= __build_refbox() ;
         if (variable_get('patroninfo_debug', 0)) {
           $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>" . print_r($pima, TRUE) . print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>SID " . SID, TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
@@ -562,6 +563,7 @@ function _patroninfo_tabs($ptabs) {
   $ul = '<div id="pi-tabs" class="xtabs"><ul>' . "\n";
   $tabn = 0;
   foreach ($ptabs as $item) {
+  $len = '0';
     $variables = array(
       'header' => $item[1],
       'rows' => $item[0],
@@ -569,8 +571,11 @@ function _patroninfo_tabs($ptabs) {
       'attributes' => array(),
       );
     $bc = theme_table($variables); // jgr25
+    if (is_array($item[0])) {
+      $len = sizeof($item[0]);
+    }
     //$bc = theme_table($item[1], $item[0], null, $item[2]);
-    $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . sizeof($item[0]) . ')</span></a></li>' . "\n";
+    $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . $len . ')</span></a></li>' . "\n";
     $dv .= "<div id=\"frag-$tabn\">" . $bc . '</div>' . "\n";
     $tabn++;
   }
