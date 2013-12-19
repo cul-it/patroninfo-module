@@ -28,7 +28,7 @@ function patroninfo_block_info() {
  */
 function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings
-  $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
+  $odata =  $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
   switch ($delta) {
     case 'patroninfo':
       // views_include("tabs"); jgr25 trial remove for Drupal7
@@ -53,6 +53,7 @@ function patroninfo_block_view($delta) {
       //if ($netid == 'es287'){$netid = 'keb11';}
       //if ($netid == 'es287'){$netid = 'kjh10';}
       //if ($netid == 'es287'){$netid = 'uak4';}
+      $renew_user = '';
       if (user_access(OTHER_USER)) {
         $renewsessionname = $_COOKIE['renewsession'];
         if (is_file("/tmp/" . $renewsessionname . ".txt")) {
@@ -237,7 +238,7 @@ function patroninfo_block_view($delta) {
             }
             $modate = date("M", mktime(0, 0, 0, substr($due, 5, 2), 1));
             $visdue = $modate . substr($due, 7, 3) . '-' . substr($due, 0, 4);
-            if (strlen($item->re) > 0) {
+            if (isset($item->re) && strlen($item->re) > 0) {
               $note = "Recalled. Please note due date.";
               $due = $item->re;
             }
@@ -417,8 +418,9 @@ function patroninfo_block_view($delta) {
         // no such call in drupal 7 $blocks['content'] .= drupal_render_form('renewform', $form);
         $blocks['content']  .= drupal_render($form); 
         //$blocks['content'] .= __build_refbox() ;
+        $fs = '';
         if (variable_get('patroninfo_debug', 0)) {
-          $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>" . print_r($pima, TRUE) . print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>SID " . SID, TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
+          $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>" . print_r($pima, TRUE) . print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
         }
         return $blocks;
       }
@@ -562,6 +564,7 @@ function _link($label, $class, $link) {
 function _patroninfo_tabs($ptabs) {
   $ul = '<div id="pi-tabs" class="xtabs"><ul>' . "\n";
   $tabn = 0;
+  $dv = '';
   foreach ($ptabs as $item) {
   $len = '0';
     $variables = array(
@@ -867,7 +870,8 @@ function __build_cite_link(&$item) {
   if (isset($item->ou_pp)) {
     $pubs = '&ou_pb=' . urlencode($item->ou_pb) . '&ou_pp=' . urlencode($item->ou_pp) . '&ou_yr=' . urlencode($item->ou_yr);
   }
-  $base = "<a class='patroninfo-export' target='_refworks' href=" . base_path() . drupal_get_path('module', 'patroninfo') . '/citation.php?' . 'ou_aulast=' . urlencode($item->ou_aulast) . '&ou_genre=' . urlencode($genre) . '&ou_title=' . urlencode($item->ou_title) . '&ou_isbn=' . urlencode($item->ou_isbn) . $pubs . '>&nbsp; Export to RefWorks</a>';
+  $isbn = isset($item->ou_isbn)? ('&ou_isbn=' . urlencode($item->ou_isbn)): '' ;
+  $base = "<a class='patroninfo-export' target='_refworks' href=" . base_path() . drupal_get_path('module', 'patroninfo') . '/citation.php?' . 'ou_aulast=' . urlencode($item->ou_aulast) . '&ou_genre=' . urlencode($genre) . '&ou_title=' . urlencode($item->ou_title) . $isbn . '>&nbsp; Export to RefWorks</a>';
   //$base .= "<span class='cite'>Cite</span><span class='cbox'>CBOX</span>";
   return $base;
 }
