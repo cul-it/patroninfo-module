@@ -171,6 +171,7 @@ function patroninfo_block_view($delta) {
           '#name' => 'cbotton',
           '#type' => 'button',
           '#button_type' => 'button',
+          '#weight' => 110,
           '#value' => t('Export Marked Items'),
         );
         $form['cbotta'] = array(
@@ -178,6 +179,7 @@ function patroninfo_block_view($delta) {
           '#name' => 'cbottona',
           '#type' => 'button',
           '#button_type' => 'button',
+          '#weight' => 111,
           '#value' => t('Export All Items'),
         );
         $form['xsubmit'] = array(
@@ -185,6 +187,7 @@ function patroninfo_block_view($delta) {
           '#name' => 'cbottond',
           '#type' => 'submit',
           '#value' => t('Renew All Voyager Items'),
+          '#weight' => 100,
           '#button_type' => 'button',
         );
         $form['submit'] = array(
@@ -192,6 +195,7 @@ function patroninfo_block_view($delta) {
           '#name' => 'cbottonc',
           '#type' => 'submit',
           '#value' => t('Renew Marked Items'),
+          '#weight' => 99,
           '#button_type' => 'button',
         );
         if (user_access(OTHER_USER)) {
@@ -571,6 +575,10 @@ function _patroninfo_tabs($ptabs) {
       'header' => $item[1],
       'rows' => $item[0],
       'caption' => $item[2],
+      'no_striping' => FALSE,
+      'empty' => '',
+      'colgroups' => array(),
+      'sticky' => TRUE,
       'attributes' => array(),
       );
     $bc = theme_table($variables); // jgr25
