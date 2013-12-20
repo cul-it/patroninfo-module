@@ -4,7 +4,7 @@ Drupal.behaviors.patroninfoBehavior = function (context) {
         document.cookie = encodeURIComponent('netid')+'=deleted; path=/; domain=.cornell.edu; expires=' + new Date(0).toUTCString();
   }
   timeMsg();
-  $(".cite").click(function(event) {
+  /* $(".cite").click(function(event) {
      //alert($(this));
      //alert(event);
      //alert(event.target.nodeName);
@@ -15,6 +15,7 @@ Drupal.behaviors.patroninfoBehavior = function (context) {
      $("#patroninfo-export-box").corner();
      _pi_refbox(hr,ti);
    });
+  */
   $("#togglecb").click( function(event) {
     $("#patroninfo-export-box").hide();
     return true;

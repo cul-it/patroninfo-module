@@ -170,34 +170,34 @@ function patroninfo_block_view($delta) {
         $form['cbott'] = array(
           '#id' => 'cbotton',
           '#name' => 'cbotton',
-          '#type' => 'button',
+          '#type' => 'submit',
           '#button_type' => 'button',
-          '#weight' => 110,
-          '#value' => t('Export Marked Items'),
+          '#weight' => 90,
+          '#value' => t('Send citation manager marked items'),
         );
         $form['cbotta'] = array(
           '#id' => 'cbottona',
           '#name' => 'cbottona',
-          '#type' => 'button',
+          '#type' => 'submit',
           '#button_type' => 'button',
-          '#weight' => 111,
-          '#value' => t('Export All Items'),
+          '#weight' => 91,
+          '#value' => t('Send citation manager all items'),
         );
         $form['xsubmit'] = array(
           '#id' => 'cbottond',
           '#name' => 'cbottond',
           '#type' => 'submit',
-          '#value' => t('Renew All Voyager Items'),
-          '#weight' => 100,
           '#button_type' => 'button',
+          '#value' => t('Renew All Voyager Items'),
+          '#weight' => 10,
         );
         $form['submit'] = array(
           '#id' => 'cbottonc',
           '#name' => 'cbottonc',
           '#type' => 'submit',
-          '#value' => t('Renew Marked Items'),
-          '#weight' => 99,
           '#button_type' => 'button',
+          '#value' => t('Renew Marked Items'),
+          '#weight' => 9,
         );
         if (user_access(OTHER_USER)) {
           $form['cbottb'] = array(
@@ -604,19 +604,12 @@ function _patroninfo_tabs($ptabs) {
  */
 function _patroninfo_add_local() {
   drupal_add_css(drupal_get_path('module', 'patroninfo') . '/css/patroninfo-flora.pi.css');
-  //drupal_add_css(drupal_get_path('module', 'patroninfo') . '/css/patroninfo-export-box.css');
-  //drupal_add_js(drupal_get_path('module', 'patroninfo') .'/js/jquery-ui-1.6.custom.min.js');
-  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/jquery.corner.js');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-ui.core.js');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-ui.tabs.js');
   //drupal_add_library('system', 'ui');
   //drupal_add_library('system', 'ui.tabs');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-jquery.js');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-divheader.js');
-  //drupal_add_css(drupal_get_path('module', 'patroninfo') .'/css/ui-lightness/ui.all.css');
-  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.resizable.js');
-  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.draggable.js');
-  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.dialog.js');
   $boiler = '
   jQuery(function( $ ){
     $(document).ready(function(){
@@ -641,17 +634,16 @@ function _patroninfo_add_local() {
 			$("#cbottonc").show();
                       }
                       if (t.match("Fines") || t.match("Notices")){
-			$("#cbottona").hide();
-			$("#cbotton").hide();
-			$("#cbottond").hide();
 			$("#cbottonc").hide();
+			$("#cbottond").hide();
+			$("#cbotton").hide();
+			$("#cbottona").hide();
                       }
                       if (t.match("Checked") ){
-			$("#cbottond").show();
-			$("#cbottona").show();
-			$("#cbotton").show();
-			$("#cbottond").show();
 			$("#cbottonc").show();
+			$("#cbottond").show();
+			$("#cbotton").show();
+			$("#cbottona").show();
 			$("#cbottonc").val("Renew Marked Items");
                       }
                       }
