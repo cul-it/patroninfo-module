@@ -31,6 +31,7 @@ function patroninfo_block_view($delta) {
   $odata =  $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
   switch ($delta) {
     case 'patroninfo':
+      dpm(drupal_get_library('system'));
       // views_include("tabs"); jgr25 trial remove for Drupal7
       // views_add_css('admin'); jgr25 trial remove for Drupal7
       _patroninfo_add_local();
@@ -249,6 +250,7 @@ function patroninfo_block_view($delta) {
             if (!empty($item->vstatus)) {
               $note .= ' ' . $item->vstatus;
             }
+            $visdue = __pa_fmt_date($visdue);
             if ($due == $today) {
               // the space makes the string sort to the top -- so leave it there.
               // the span is for anyone who wants to style things due today.
@@ -569,11 +571,13 @@ function _patroninfo_tabs($ptabs) {
   $ul = '<div id="pi-tabs" class="xtabs"><ul>' . "\n";
   $tabn = 0;
   $dv = '';
+
+  dpm($ptabs);
   foreach ($ptabs as $item) {
   $len = '0';
     $variables = array(
       'header' => $item[1],
-      'rows' => $item[0],
+      'rows' =>is_array($item[0])? $item[0]:array(),
       'caption' => $item[2],
       'no_striping' => FALSE,
       'empty' => '',
@@ -600,17 +604,19 @@ function _patroninfo_tabs($ptabs) {
  */
 function _patroninfo_add_local() {
   drupal_add_css(drupal_get_path('module', 'patroninfo') . '/css/patroninfo-flora.pi.css');
-  drupal_add_css(drupal_get_path('module', 'patroninfo') . '/css/patroninfo-export-box.css');
+  //drupal_add_css(drupal_get_path('module', 'patroninfo') . '/css/patroninfo-export-box.css');
   //drupal_add_js(drupal_get_path('module', 'patroninfo') .'/js/jquery-ui-1.6.custom.min.js');
+  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/jquery.corner.js');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-ui.core.js');
-  drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/jquery.corner.js');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-ui.tabs.js');
+  //drupal_add_library('system', 'ui');
+  //drupal_add_library('system', 'ui.tabs');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-jquery.js');
   //drupal_add_css(drupal_get_path('module', 'patroninfo') .'/css/ui-lightness/ui.all.css');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-divheader.js');
-  drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.resizable.js');
-  drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.draggable.js');
-  drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.dialog.js');
+  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.resizable.js');
+  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.draggable.js');
+  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.dialog.js');
   $boiler = '
   jQuery(function( $ ){
     $(document).ready(function(){
@@ -958,5 +964,13 @@ function __pa_renewal_denied_api($patronid) {
     $block .= $node . "\n";
   }
   return $block;
+}
+
+# replace - with non breaking hyphen, so dates do not wrap in table.
+function __pa_fmt_date($date) {
+  $pattern = '/(\w+)-(\d+)-(\d+)/i';
+  $replacement = '${1}&#8209;${2}&#8209;${3}';
+  $string = preg_replace($pattern, $replacement, $date);
+  return $string;
 }
 
