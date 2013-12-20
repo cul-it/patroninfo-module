@@ -612,8 +612,8 @@ function _patroninfo_add_local() {
   //drupal_add_library('system', 'ui');
   //drupal_add_library('system', 'ui.tabs');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-jquery.js');
-  //drupal_add_css(drupal_get_path('module', 'patroninfo') .'/css/ui-lightness/ui.all.css');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-divheader.js');
+  //drupal_add_css(drupal_get_path('module', 'patroninfo') .'/css/ui-lightness/ui.all.css');
   //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.resizable.js');
   //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.draggable.js');
   //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/ui.dialog.js');
@@ -660,7 +660,7 @@ function _patroninfo_add_local() {
 });
     ';
 
-  drupal_add_js($boiler, array('type' => 'inline', 'scope' => JS_DEFAULT));
+  drupal_add_js($boiler, array('type' => 'inline', 'group' => JS_DEFAULT));
 }
 
 /**
