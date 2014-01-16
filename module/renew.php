@@ -75,9 +75,9 @@ $inid = $_POST['inid'];
 $netid = $_POST['netid'];
 
 $_SESSION['renew_user'] = $_POST['netid'];
-$handle = fopen("/tmp/" . $renewsessionname . ".txt", "w+");
-fwrite($handle, $netid);
-fclose($handle);
+//$handle = fopen("/tmp/" . $renewsessionname . ".txt", "w+");
+//fwrite($handle, $netid);
+//fclose($handle);
 $auths = array(
   'illiad' => array($netid, $netid, $netid, $netid),
   'voyager' => array($bc, $sn, $inid, $pid),
@@ -92,7 +92,7 @@ $errors = '';
 
 //if ($renewablec > 0 && $requestc>0 )  $r = implode(',',$requested);
 for ($i = 0; $i < $cancelc; $i++) {
-  if ($_POST['item_' . $i . '_cancel']) {
+  if (isset($_POST['item_' . $i . '_cancel'])) {
     $val = explode(":", $_POST['item_' . $i . '_cancel']);
     $sys = $val[0];
     $canceled[$sys][] = $val[1];
