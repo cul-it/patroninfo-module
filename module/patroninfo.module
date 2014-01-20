@@ -403,11 +403,11 @@ function patroninfo_block_view($delta) {
 
         // $blocks['content'] = "<h2>$wmsg</h2> <h3 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you // $ecount </h3>";
         $blocks['content'] = "<h2 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you</h2>";
-        $p1 = array($cdatad, array(t('Renew'), t('Due Date'), t('Title'), t(' ')), t('Checked Out'));
-        $p2 = array($wdatad, array(t('Pickup Before'), t('Title'), t('At')), t('Available Requests'));
-        $p3 = array($odatad, array(t('Cancel'), t('Request Expires'), t('Title'), t('At')), t('Pending Requests'));
-        $p4 = array($fdatad, array(t('Incurred On'), t('Title'), t('Amt')), t('Fines and Fees'));
-        $p5 = array($ndatad, array(t('Date'), t('Item and message'), t('At')), t('Notices'));
+        $p1 = array($cdatad, array(t('Renew'), t('Due Date'), t('Title'), t(' ')), t('Checked Out '));
+        $p2 = array($wdatad, array(t('Pickup Before'), t('Title'), t('At')), t('Available Requests '));
+        $p3 = array($odatad, array(t('Cancel'), t('Request Expires'), t('Title'), t('At')), t('Pending Requests '));
+        $p4 = array($fdatad, array(t('Incurred On'), t('Title'), t('Amt')), t('Fines and Fees '));
+        $p5 = array($ndatad, array(t('Date'), t('Item and message'), t('At')), t('Notices '));
         $form['panels'] = array(
           '#type' => 'markup',
           '#markup' => _patroninfo_tabs(array($p1, $p2, $p3, $p4, $p5)),
