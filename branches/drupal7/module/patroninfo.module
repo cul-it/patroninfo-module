@@ -173,7 +173,7 @@ function patroninfo_block_view($delta) {
           '#type' => 'submit',
           '#button_type' => 'button',
           '#weight' => 90,
-          '#value' => t('Send citation manager marked items'),
+          '#value' => t('Send marked items to citation manager'),
         );
         $form['cbotta'] = array(
           '#id' => 'cbottona',
@@ -181,14 +181,14 @@ function patroninfo_block_view($delta) {
           '#type' => 'submit',
           '#button_type' => 'button',
           '#weight' => 91,
-          '#value' => t('Send citation manager all items'),
+          '#value' => t('Send all items to citation manager'),
         );
         $form['xsubmit'] = array(
           '#id' => 'cbottond',
           '#name' => 'cbottond',
           '#type' => 'submit',
           '#button_type' => 'button',
-          '#value' => t('Renew All Voyager Items'),
+          '#value' => t('Renew all items'),
           '#weight' => 10,
         );
         $form['submit'] = array(
@@ -196,7 +196,7 @@ function patroninfo_block_view($delta) {
           '#name' => 'cbottonc',
           '#type' => 'submit',
           '#button_type' => 'button',
-          '#value' => t('Renew Marked Items'),
+          '#value' => t('Renew marked items'),
           '#weight' => 9,
         );
         if (user_access(OTHER_USER)) {
@@ -615,7 +615,7 @@ function _patroninfo_add_local() {
   jQuery(function( $ ){
     $(document).ready(function(){
                       $("#pi-tabs > ul").tabs();
-	              $("#cbottonc").val("Renew Marked Items");
+	              $("#cbottonc").val("Renew marked items");
 		      $(".ui-tabs-nav > li > a").bind("click",function(event)
                       {
                       var t = event.target.textContent;
@@ -645,7 +645,7 @@ function _patroninfo_add_local() {
 			$("#cbottond").show();
 			$("#cbotton").show();
 			$("#cbottona").show();
-			$("#cbottonc").val("Renew Marked Items");
+			$("#cbottonc").val("Renew marked items");
                       }
                       }
                       );
