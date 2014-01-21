@@ -624,16 +624,16 @@ function _patroninfo_add_local() {
 			$("#cbottona").hide();
 			$("#cbotton").show();
 			$("#cbottond").hide();
-			$("#cbottonc").val("Cancel Marked Items");
-			$("#cbottonc").text("Cancel Marked Items");
+			$("#cbottonc").val("Cancel marked items");
+			$("#cbottonc").text("Cancel marked items");
 			$("#cbottonc").show();
                       }
                       if (t.match("Available")){
 			$("#cbottond").hide();
 			$("#cbottona").hide();
 			$("#cbotton").hide();
-			$("#cbottonc").text("Cancel Marked Items");
-			$("#cbottonc").val("Cancel Marked Items");
+			$("#cbottonc").text("Cancel marked items");
+			$("#cbottonc").val("Cancel marked items");
 			$("#cbottonc").show();
                       }
                       if (t.match("Fines") || t.match("Notices")){
@@ -648,7 +648,7 @@ function _patroninfo_add_local() {
 			$("#cbotton").show();
 			$("#cbottona").show();
 			$("#cbottonc").val("Renew marked items");
-			$("#cbottonc").text("Renew Marked Items");
+			$("#cbottonc").text("Renew marked Items");
                       }
                       }
                       );
