@@ -173,7 +173,7 @@ function patroninfo_block_view($delta) {
           '#type' => 'submit',
           '#button_type' => 'button',
           '#weight' => 90,
-          '#value' => t('Send citation manager marked items'),
+          '#value' => t('Send marked items to citation manager'),
         );
         $form['cbotta'] = array(
           '#id' => 'cbottona',
@@ -181,14 +181,14 @@ function patroninfo_block_view($delta) {
           '#type' => 'submit',
           '#button_type' => 'button',
           '#weight' => 91,
-          '#value' => t('Send citation manager all items'),
+          '#value' => t('Send all items to citation manager'),
         );
         $form['xsubmit'] = array(
           '#id' => 'cbottond',
           '#name' => 'cbottond',
           '#type' => 'submit',
           '#button_type' => 'button',
-          '#value' => t('Renew All Voyager Items'),
+          '#value' => t('Renew all items'),
           '#weight' => 10,
         );
         $form['submit'] = array(
@@ -196,7 +196,7 @@ function patroninfo_block_view($delta) {
           '#name' => 'cbottonc',
           '#type' => 'submit',
           '#button_type' => 'button',
-          '#value' => t('Renew Marked Items'),
+          '#value' => t('Renew marked items'),
           '#weight' => 9,
         );
         if (user_access(OTHER_USER)) {
@@ -401,12 +401,13 @@ function patroninfo_block_view($delta) {
         $ecount = count($pima) > 0 ? count($pima) -1 . " errors" : "";
         //$wmsg = "Please note -- the Voyager catalog will be in read-only mode during software upgrade from the morning of Monday Dec 24 2012 until the morning of Wed. Jan 2 2013.  Users of the catalog will not be able to renew items, do holds, recalls, and delivery requests.  Returned items will not appear as returned until full production returns.";
 
-        $blocks['content'] = "<h2>$wmsg</h2> <h3 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you // $ecount </h3>";
-        $p1 = array($cdatad, array(t('Renew'), t('Due Date'), t('Title'), t(' ')), t('Checked Out'));
-        $p2 = array($wdatad, array(t('Pickup Before'), t('Title'), t('At')), t('Available Requests'));
-        $p3 = array($odatad, array(t('Cancel'), t('Request Expires'), t('Title'), t('At')), t('Pending Requests'));
-        $p4 = array($fdatad, array(t('Incurred On'), t('Title'), t('Amt')), t('Fines and Fees'));
-        $p5 = array($ndatad, array(t('Date'), t('Item and message'), t('At')), t('Notices'));
+        // $blocks['content'] = "<h2>$wmsg</h2> <h3 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you // $ecount </h3>";
+        $blocks['content'] = "<h2 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you</h2>";
+        $p1 = array($cdatad, array(t('Renew'), t('Due Date'), t('Title'), t(' ')), t('Checked Out '));
+        $p2 = array($wdatad, array(t('Pickup Before'), t('Title'), t('At')), t('Available Requests '));
+        $p3 = array($odatad, array(t('Cancel'), t('Request Expires'), t('Title'), t('At')), t('Pending Requests '));
+        $p4 = array($fdatad, array(t('Incurred On'), t('Title'), t('Amt')), t('Fines and Fees '));
+        $p5 = array($ndatad, array(t('Date'), t('Item and message'), t('At')), t('Notices '));
         $form['panels'] = array(
           '#type' => 'markup',
           '#markup' => _patroninfo_tabs(array($p1, $p2, $p3, $p4, $p5)),
@@ -614,37 +615,37 @@ function _patroninfo_add_local() {
   jQuery(function( $ ){
     $(document).ready(function(){
                       $("#pi-tabs > ul").tabs();
-                $("#cbottonc").val("Renew Marked Items");
-          $(".ui-tabs-nav > li > a").bind("click",function(event)
+	              $("#cbottonc").val("Renew marked items");
+		      $(".ui-tabs-nav > li > a").bind("click",function(event)
                       {
                       var t = event.target.textContent;
                       if (!t) t = event.target.innerText;
                       if (t.match("Pending")){
-      $("#cbottona").hide();
-      $("#cbotton").show();
-      $("#cbottond").hide();
-      $("#cbottonc").val("Cancel Marked Items");
-      $("#cbottonc").show();
+			$("#cbottona").hide();
+			$("#cbotton").show();
+			$("#cbottond").hide();
+			$("#cbottonc").val("Cancel Marked Items");
+			$("#cbottonc").show();
                       }
                       if (t.match("Available")){
-      $("#cbottond").hide();
-      $("#cbottona").hide();
-      $("#cbotton").hide();
-      $("#cbottonc").val("Cancel Marked Items");
-      $("#cbottonc").show();
+			$("#cbottond").hide();
+			$("#cbottona").hide();
+			$("#cbotton").hide();
+			$("#cbottonc").val("Cancel Marked Items");
+			$("#cbottonc").show();
                       }
                       if (t.match("Fines") || t.match("Notices")){
-      $("#cbottonc").hide();
-      $("#cbottond").hide();
-      $("#cbotton").hide();
-      $("#cbottona").hide();
+			$("#cbottonc").hide();
+			$("#cbottond").hide();
+			$("#cbotton").hide();
+			$("#cbottona").hide();
                       }
                       if (t.match("Checked") ){
-      $("#cbottonc").show();
-      $("#cbottond").show();
-      $("#cbotton").show();
-      $("#cbottona").show();
-      $("#cbottonc").val("Renew Marked Items");
+			$("#cbottonc").show();
+			$("#cbottond").show();
+			$("#cbotton").show();
+			$("#cbottona").show();
+			$("#cbottonc").val("Renew marked items");
                       }
                       }
                       );
@@ -877,7 +878,7 @@ function __build_cite_link(&$item) {
     $pubs = '&ou_pb=' . urlencode($item->ou_pb) . '&ou_pp=' . urlencode($item->ou_pp) . '&ou_yr=' . urlencode($item->ou_yr);
   }
   $isbn = isset($item->ou_isbn)? ('&ou_isbn=' . urlencode($item->ou_isbn)): '' ;
-  $base = "<a class='patroninfo-export' target='_refworks' href=" . base_path() . drupal_get_path('module', 'patroninfo') . '/citation.php?' . 'ou_aulast=' . urlencode($item->ou_aulast) . '&ou_genre=' . urlencode($genre) . '&ou_title=' . urlencode($item->ou_title) . $isbn . '>&nbsp; Export to RefWorks</a>';
+  $base = "<a class='patroninfo-export' target='_refworks' href=" . base_path() . drupal_get_path('module', 'patroninfo') . '/citation.php?' . 'ou_aulast=' . urlencode($item->ou_aulast) . '&ou_genre=' . urlencode($genre) . '&ou_title=' . urlencode($item->ou_title) . $isbn . '>Export to RefWorks</a>';
   //$base .= "<span class='cite'>Cite</span><span class='cbox'>CBOX</span>";
   return $base;
 }
@@ -916,13 +917,13 @@ function __build_refbox() {
                 <input type="image" src="close-16x16.png" id="togglecb" value="X"/>
             </div>
         </div>
-  <hr/>
-  <br/>
+	<hr/>
+	<br/>
         <div class="mbox">
            <div class="bleft">Title:<span id="rname"></span>...</div>
         </div>
-  <hr/>
-  <br/>
+	<hr/>
+	<br/>
         <div class="mbox">
             <a class="linea" id="dest" href="">Save to refworks</a>
             <br/>
