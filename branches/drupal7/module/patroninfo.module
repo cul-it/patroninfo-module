@@ -620,9 +620,7 @@ function _patroninfo_add_local() {
                       {
                       var t = event.target.textContent;
                       if (!t) t = event.target.innerText;
-		      alert(t);
                       if (t.match("Pending")){
-                        alert("showing Pending");
 			$("#cbottona").hide();
 			$("#cbotton").show();
 			$("#cbottond").hide();
@@ -631,7 +629,6 @@ function _patroninfo_add_local() {
 			$("#cbottonc").show();
                       }
                       if (t.match("Available")){
-                        alert("matching Available event");
 			$("#cbottond").hide();
 			$("#cbottona").hide();
 			$("#cbotton").hide();
