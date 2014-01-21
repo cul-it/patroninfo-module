@@ -620,17 +620,22 @@ function _patroninfo_add_local() {
                       {
                       var t = event.target.textContent;
                       if (!t) t = event.target.innerText;
+		      alert(t);
                       if (t.match("Pending")){
+                        alert("showing Pending");
 			$("#cbottona").hide();
 			$("#cbotton").show();
 			$("#cbottond").hide();
 			$("#cbottonc").val("Cancel Marked Items");
+			$("#cbottonc").text("Cancel Marked Items");
 			$("#cbottonc").show();
                       }
                       if (t.match("Available")){
+                        alert("matching Available event");
 			$("#cbottond").hide();
 			$("#cbottona").hide();
 			$("#cbotton").hide();
+			$("#cbottonc").text("Cancel Marked Items");
 			$("#cbottonc").val("Cancel Marked Items");
 			$("#cbottonc").show();
                       }
@@ -646,6 +651,7 @@ function _patroninfo_add_local() {
 			$("#cbotton").show();
 			$("#cbottona").show();
 			$("#cbottonc").val("Renew marked items");
+			$("#cbottonc").text("Renew Marked Items");
                       }
                       }
                       );
