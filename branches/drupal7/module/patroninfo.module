@@ -31,7 +31,7 @@ function patroninfo_block_view($delta) {
   $odata =  $fdata = $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
   switch ($delta) {
     case 'patroninfo':
-      dpm(drupal_get_library('system'));
+      //dpm(drupal_get_library('system'));
       // views_include("tabs"); jgr25 trial remove for Drupal7
       // views_add_css('admin'); jgr25 trial remove for Drupal7
       _patroninfo_add_local();
@@ -574,7 +574,7 @@ function _patroninfo_tabs($ptabs) {
   $tabn = 0;
   $dv = '';
 
-  dpm($ptabs);
+  //dpm($ptabs);
   foreach ($ptabs as $item) {
   $len = '0';
     $variables = array(
