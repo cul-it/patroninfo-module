@@ -28,7 +28,7 @@ function patroninfo_block_info() {
  */
 function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings
-  $odata =  $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
+  $odata =  $fdata = $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
   switch ($delta) {
     case 'patroninfo':
       dpm(drupal_get_library('system'));
@@ -300,7 +300,7 @@ function patroninfo_block_view($delta) {
             );
             $cdata .= '<li class=patroninfo-item>' . $item->tl . ' ' . $due . t(' borrowed from ') . $item->lo . '</li>';
           }
-          if (($item->status == 'Unfilled') || ($item->status == 'Cancelled') || ($item->system == 'illiad') && ($item->TransactionStatus == 'Cancelled by Customer')) {
+          if (($item->status == 'Unfilled') || ($item->status == 'Cancelled') || (isset($item->system)) && ($item->system == 'illiad') && ($item->TransactionStatus == 'Cancelled by Customer')) {
             if ($item->od == $item->rd) {
               $due = $item->od;
             }
@@ -372,9 +372,10 @@ function patroninfo_block_view($delta) {
             $finedate = $item->ed;
             $modate = date("M", mktime(0, 0, 0, substr($finedate, 5, 2), 1));
             $visfinedate = $modate . substr($finedate, 7, 3) . '-' . substr($finedate, 0, 4);
-            $am = substr($item->am, 0, strlen -2) . '.' . substr($item->am, -2);
+            $am = substr($item->am, 0, strlen($item->am)-2) . '.' . substr($item->am, -2);
             $fdatad[] = array($visfinedate, $item->tl, $am);
-            $fdata .= '<li class=patroninfo-item>' . $item->tl . t('was due:') . $item->od . t(' at ') . $item->lo . t('Amount:') . $item->am . '</li>';
+            $od = isset($item->od) ? $item->od  : '';
+            $fdata .= '<li class=patroninfo-item>' . $item->tl . t('was due:') . $od . t(' at ') . $item->lo . t('Amount:') . $item->am . '</li>';
           }
         }
         if ($cindex) { // only sort if there is something there.
