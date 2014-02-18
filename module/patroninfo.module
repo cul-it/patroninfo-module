@@ -28,6 +28,8 @@ function patroninfo_block_info() {
  */
 function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings
+  $cdatad = array();
+  $wdata = $deny_msg = $acc_trouble_msg = ''; 
   $odata =  $fdata = $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
   switch ($delta) {
     case 'patroninfo':
@@ -51,7 +53,7 @@ function patroninfo_block_view($delta) {
       //if ($netid == 'es287'){$netid = 'aa239';}
       //if ($netid == 'es287'){$netid = 'jk252';}
       //if ($netid == 'es287'){$netid = 'epr29';}
-      //if ($netid == 'es287'){$netid = 'keb11';}
+      //if ($netid == 'es287'){$netid = 'keb11';} // 920 (approx) items
       //if ($netid == 'es287'){$netid = 'kjh10';}
       //if ($netid == 'es287'){$netid = 'uak4';}
       $renew_user = '';
@@ -325,7 +327,7 @@ function patroninfo_block_view($delta) {
             $ndata .= '<li class=patroninfo-item>' . $item->tl . ' ' . $due . t(' borrowed from ') . $item->lo . '</li>';
           }
           if (($item->status == ' SHIPPED') || ($item->status == 'Shipped') || ($item->status == 'Pending') || (($item->status == 'pahr') && !(($item->system == 'illiad') && ($item->TransactionStatus == 'Cancelled by Customer')))) {
-            $shipped = $item->ed;
+            $shipped = isset($item->ed) ? $item->ed : '' ;
             $k = '';
             $r = '';
             if ($item->system != 'borrowdirect') {
@@ -355,8 +357,8 @@ function patroninfo_block_view($delta) {
             else {
               $at = $item->lo;
             }
-            $before = $item->ed;
-            if ($item->system == 'illiad') {
+            $before = isset($item->ed) ? $item->ed : '' ;
+            if (isset($item->system) && $item->system == 'illiad') {
               $before = $item->od;
               //$wmsg = 'see at ' . $item->url . ' ' ;
             }
