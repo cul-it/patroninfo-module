@@ -18,6 +18,7 @@ $cdir = getcwd();
 if (is_dir( '/libweb/sites/wwwdev.library.cornell.edu/htdocs')) {
    $boodir = '/libweb/sites/wwwdev.library.cornell.edu/htdocs';
 }
+   $boodir =  findboot($cdir);
 chdir($boodir);
 set_include_path(get_include_path() . PATH_SEPARATOR . $boodir);
 include_once("./includes/bootstrap.inc");
@@ -35,8 +36,6 @@ if (isset($_POST['cbottond'])) {
   $renewablec = 1; 
   $_POST['item_0_renew'] = 'voyager:all'  ;
 }
-
-
 if (isset($_POST['cbottono'])) {
  header("Location: /index");
  unset($_COOKIE['verify_netid']);
@@ -282,3 +281,15 @@ foreach ($canceled as $sysa => $ids) {
 }
 }
 }
+function findboot($p) {
+  $filename = $p;
+  while (true) {
+    $filename = $filename . "/..";
+    $tfilename = $filename . "/includes/bootstrap.inc";
+    if (file_exists($tfilename)) {
+      return $filename;
+    }
+  }
+  return $p;
+}
+

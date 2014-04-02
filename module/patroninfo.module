@@ -36,7 +36,7 @@ function patroninfo_block($op='list', $delta=0, $edit=array()) {
  			  unset($_COOKIE['netid']);
                         }
 			$actualnetid = $netid;
-                        if ($netid == 'es287'){$netid = 'mas626';} // user has blocks.
+                        //if ($netid == 'es287'){$netid = 'mas626';} // user has blocks.
                         //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
                         //if ($netid == 'es287'){$netid = 'gid-wittep';}
                         //if ($netid == 'es287'){$netid = 'sg532';}
