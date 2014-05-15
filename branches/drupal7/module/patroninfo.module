@@ -45,7 +45,7 @@ function patroninfo_block_view($delta) {
       $actualnetid = $netid;
       //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
       //if ($netid == 'es287'){$netid = 'gid-wittep';}
-      //if ($netid == 'es287'){$netid = 'sg532';}
+      if ($netid == 'es287'){$netid = 'ds895';}
       //if ($netid == 'es287'){$netid = 'gid-hollisst@CORNELL.EDU';}
       $netid = str_replace('@CORNELL.EDU', '', $netid);
       //if ($netid == 'es287'){$netid = 'epe3';}
@@ -88,6 +88,8 @@ function patroninfo_block_view($delta) {
         // and if it contains tabs.
         // at the moment some of the data is utf-8, and some iso-8859-1. got to fix this.
         //$str = iconv("ISO-8859-1", "UTF-8", $stuff);
+        //$str = iconv("IS)-8859-1", "UTF-8//IGNORE", $stuff);
+        //$str = preg_replace('/[[:^print:]]/', '', $stuff);
         $str = $stuff;
         $str = strtr($str, "\t", " ");
         $var = json_decode($str);
@@ -347,8 +349,12 @@ function patroninfo_block_view($delta) {
             else {
               $omsg = '';
             }
-            $odatad[] = array($r, $shipped, $item->tl . $omsg, $item->lo);
-            $odata .= '<li class=patroninfo-item>' . $item->tl . t('is on its way to you for pickup at : ') . $item->lo . '</li>';
+            $loc = '';
+            if   (isset($item->loc) && $item->lo != '') {
+              $loc = $item->lo;
+            }
+            $odatad[] = array($r, $shipped, $item->tl . $omsg, $loc);
+            $odata .= '<li class=patroninfo-item>' . $item->tl . t('is on its way to you for pickup at : ') . $loc . '</li>';
           }
           if ($item->status == 'waiting') {
             if (isset($item->url) && $item->url != '') {
