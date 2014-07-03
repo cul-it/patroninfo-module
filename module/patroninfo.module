@@ -45,7 +45,7 @@ function patroninfo_block_view($delta) {
       $actualnetid = $netid;
       //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
       //if ($netid == 'es287'){$netid = 'gid-wittep';}
-      if ($netid == 'es287'){$netid = 'ds895';}
+      //if ($netid == 'es287'){$netid = 'ds895';}
       //if ($netid == 'es287'){$netid = 'gid-hollisst@CORNELL.EDU';}
       $netid = str_replace('@CORNELL.EDU', '', $netid);
       //if ($netid == 'es287'){$netid = 'epe3';}
@@ -89,8 +89,8 @@ function patroninfo_block_view($delta) {
         // at the moment some of the data is utf-8, and some iso-8859-1. got to fix this.
         //$str = iconv("ISO-8859-1", "UTF-8", $stuff);
         //$str = iconv("IS)-8859-1", "UTF-8//IGNORE", $stuff);
-        //$str = preg_replace('/[[:^print:]]/', '', $stuff);
-        $str = $stuff;
+        $str = preg_replace('/[[:^print:]]/', '', $stuff);
+        //$str = $stuff;
         $str = strtr($str, "\t", " ");
         $var = json_decode($str);
         $patroninfo_data = $var;
