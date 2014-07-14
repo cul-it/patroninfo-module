@@ -63,6 +63,14 @@ if (isset($_POST['cbotton'])) {
   sendthem($dest, $data);
   exit(0);
 }
+
+if (isset($_POST['cbottona'])) {
+  foreach ($var->items as $item) {
+    $data .= citethem($item);
+  }
+  sendthem($dest, $data);
+  exit(0);
+}
 include_once $cdir . '/' . "NCIPc.php";
 include_once $cdir . '/' . "NCIPcv1.php";
 include_once $cdir . '/' . "NCIPcv2.php";
