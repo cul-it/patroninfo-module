@@ -411,6 +411,7 @@ function patroninfo_block_view($delta) {
         //$wmsg = "Please note -- the Voyager catalog will be in read-only mode during software upgrade from the morning of Monday Dec 24 2012 until the morning of Wed. Jan 2 2013.  Users of the catalog will not be able to renew items, do holds, recalls, and delivery requests.  Returned items will not appear as returned until full production returns.";
 
         // $blocks['content'] = "<h2>$wmsg</h2> <h3 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you // $ecount </h3>";
+        $blocks['content'] = "<a href='http://newcatalog.library.cornell.edu' class='pull-right btn btn-default'>" . t('Go to Library Catalog') . "<i class='fa fa-angle-double-right'></i></a>";
         $blocks['content'] = "<h2 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you</h2>";
         $p1 = array($cdatad, array(t('Renew'), t('Due Date'), t('Title'), t(' ')), t('Checked Out '));
         $p2 = array($wdatad, array(t('Pickup Before'), t('Title'), t('At')), t('Available Requests '));
