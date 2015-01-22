@@ -44,6 +44,7 @@ function patroninfo_block_view($delta) {
       }
       $actualnetid = $netid;
       //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
+      //if ($netid == 'es287'){$netid = 'ajs17';}
       //if ($netid == 'es287'){$netid = 'gid-wittep';}
       //if ($netid == 'es287'){$netid = 'ds895';}
       //if ($netid == 'es287'){$netid = 'gid-hollisst@CORNELL.EDU';}
@@ -56,6 +57,7 @@ function patroninfo_block_view($delta) {
       //if ($netid == 'es287'){$netid = 'keb11';} // 920 (approx) items
       //if ($netid == 'es287'){$netid = 'kjh10';}
       //if ($netid == 'es287'){$netid = 'uak4';}
+      //if ($netid == 'es287'){$netid = 'jgr25';}
       $renew_user = '';
       if (user_access(OTHER_USER)) {
         $renewsessionname = $_COOKIE['renewsession'];
@@ -585,7 +587,20 @@ function _patroninfo_tabs($ptabs) {
   //dpm($ptabs);
   foreach ($ptabs as $item) {
   $len = '0';
-    $variables = array(
+  $emsg = $item[2];
+  if (stristr($emsg,'Checked') !== FALSE) 
+    $emsg = "Checked Out Items";
+  $evariables = array(
+      'header' => array(t("No " . $emsg)),
+      'rows' =>array(),
+      'caption' => 'No items',
+      'no_striping' => TRUE,
+      'empty' => '',
+      'colgroups' => array(),
+      'sticky' => TRUE,
+      'attributes' => array(),
+      );
+  $variables = array(
       'header' => $item[1],
       'rows' =>is_array($item[0])? $item[0]:array(),
       'caption' => $item[2],
@@ -595,10 +610,13 @@ function _patroninfo_tabs($ptabs) {
       'sticky' => TRUE,
       'attributes' => array(),
       );
-    $bc = theme_table($variables); // jgr25
     if (is_array($item[0])) {
       $len = sizeof($item[0]);
     }
+    if ($len != '0')
+      $bc = theme_table($variables); // jgr25
+    else
+      $bc = theme_table($evariables);
     //$bc = theme_table($item[1], $item[0], null, $item[2]);
     $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . $len . ')</span></a></li>' . "\n";
     $dv .= "<div id=\"frag-$tabn\">" . $bc . '</div>' . "\n";
