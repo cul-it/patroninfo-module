@@ -43,6 +43,7 @@ function patroninfo_block_view($delta) {
         unset($_COOKIE['netid']);
       }
       $actualnetid = $netid;
+      //if ($netid == 'es287'){$netid = 'mls5';} // lots of stuff 
       //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
       //if ($netid == 'es287'){$netid = 'ajs17';}
       //if ($netid == 'es287'){$netid = 'gid-wittep';}
@@ -299,7 +300,7 @@ function patroninfo_block_view($delta) {
             }
             $r .= $msg; //. __build_cite_link($item);
             //$cdatad[]= array($due,$r.$item->tl . t('Location:').$item->lo.". $note",'');
-            $cdatad[] = array($r, $visdue, $item->tl . t('Location:') . $item->lo . ". $note" . __build_cite_link($item) . __build_coins($item), '');
+            $cdatad[] = array($r, $visdue, __pa_fmt_tl($item)  . t('Location:') . $item->lo . ". $note" . __build_cite_link($item) . __build_coins($item), '');
             $scdatad[] = array(
               'index' => $cindex++,
               'due' => $due,
@@ -355,7 +356,7 @@ function patroninfo_block_view($delta) {
             if   (isset($item->loc) && $item->lo != '') {
               $loc = $item->lo;
             }
-            $odatad[] = array($r, $shipped, $item->tl . $omsg, $loc);
+            $odatad[] = array($r, $shipped, __pa_fmt_tl($item) . $omsg, $loc);
             $odata .= '<li class=patroninfo-item>' . $item->tl . t('is on its way to you for pickup at : ') . $loc . '</li>';
           }
           if ($item->status == 'waiting') {
@@ -375,7 +376,7 @@ function patroninfo_block_view($delta) {
             }
             $modate = date("M", mktime(0, 0, 0, substr($before, 5, 2), 1));
             $visbefore = $modate . substr($before, 7, 3) . '-' . substr($before, 0, 4);
-            $wdatad[] = array($visbefore, $item->tl . $wmsg, $at);
+            $wdatad[] = array($visbefore, __pa_fmt_tl($item)  . $wmsg, $at);
             $wdata .= '<li class=patroninfo-item>' . $item->tl . t('is waiting for you : ') . $item->lo . '</li>';
           }
           if ($item->status == 'finef') {
@@ -743,142 +744,6 @@ function patroninfo_renewform($form) {
  * @param  [type] $form_state [description]
  * @return [type]             [description]
  */
-function patroninfo_list($form, &$form_state) {
-  $gnet = $_REQUEST['patroninfo_list'] ? $_REQUEST['patroninfo_list'] : $_SESSION['gnet'];
-  drupal_set_message(t("Request for %gnet", array('%gnet' => $gnet,)));
-  $netid = cu_authenticate();
-  if (isset($netid) && $netid != '') {
-    if ($gnet) {
-      $netid = $gnet;
-    }
-    $url = variable_get('patroninfo_target', DEFAULT_API) . $netid;
-    if (strlen($url) < 7) {
-      $url = DEFAULT_API . $netid;
-    }
-    if (variable_get('patroninfo_debug', 0)) {
-      drupal_set_message(t("Request for %url", array('%url' => $url,)));
-    }
-    $stuff = file_get_contents($url);
-    $str = iconv("ISO-8859-1", "UTF-8", $stuff);
-    $str = strtr($str, "\t", " ");
-    $var = json_decode($str);
-    $cindex = 0;
-    if (variable_get('patroninfo_debug', 0)) {
-      $stuff = $stuff;
-    }
-    else {
-      $stuff = '';
-    }
-    //$form['#action'] = url('sites/all/modules/patroninfo/renew.php');
-    $form['#action'] = url(base_path() . drupal_get_path('module', 'patroninfo') . '/renew.php');
-    $form['patroninfo_list'] = array(
-      '#prefix' => $stuff,
-      '#title' => t('Your netID'),
-      '#type' => 'textfield',
-      '#value' => $gnet ? $gnet : $netid,
-      '#description' => t('Please enter your netID'),
-    );
-    $form['bc'] = array(
-      '#type' => 'hidden',
-      '#value' => $var->patron->bc,
-    );
-    $form['sn'] = array(
-      '#type' => 'hidden',
-      '#value' => $var->patron->last,
-    );
-    $form['inid'] = array(
-      '#type' => 'hidden',
-      '#value' => $var->patron->inid,
-    );
-    // start of big loop
-    foreach ($var->items as $item) {
-      $note = '';
-      if (($item->status == 'chrged') || ($item->status == ' RECEIVED') || ($item->status == 'Received')) {
-        if ($item->od == $item->rd) {
-          $due = $item->od;
-        }
-        else {
-          $due = $item->rd;
-        }
-        if (strlen($item->re) > 0) {
-          $note = "Recalled. Please note due date.";
-          $due = $item->re;
-        }
-        if (!empty($item->vstatus)) {
-          $note .= ' ' . $item->vstatus;
-        }
-        if ($due == $today) {
-          // the space makes the string sort to the top -- so leave it there.
-          // the span is for anyone who wants to style things due today.
-          if (!empty($item->odt)) {
-            $time = ' by ' . $item->odt;
-          }
-          $due = ' <span class="patroninfo-today">*' . $due . $time . '</span>.';
-        }
-        $form['item_' . $cindex . '_renew'] = array(
-          '#title' => $item->tl . t('Location:') . $item->lo . ".$note / $due",
-          '#type' => 'checkbox',
-          '#return_value' => $item->iid,
-        );
-        $cdatad[] = array($due, $item->tl . t('Location:') . $item->lo . ". $note", '');
-        $scdatad[] = array(
-          'index' => $cindex++,
-          'due' => $due,
-        );
-      }
-      if (($item->status == 'Unfilled') || ($item->status == 'Cancelled')) {
-        if ($item->od == $item->rd) {
-          $due = $item->od;
-        }
-        else {
-          $due = $item->rd;
-        }
-        if (strlen($item->re) > 0) {
-          $note = "Recalled. Please note due date.";
-          $due = $item->re;
-        }
-        if (!empty($item->vstatus)) {
-          $note .= ' ' . $item->vstatus;
-        }
-        $ndatad[] = array($due, $item->tl . t('Location:') . $item->lo . " $note", '');
-        $ncdatad[] = array(
-          index => $nindex++,
-          due => $due,
-        );
-      }
-      if ($item->status == ' SHIPPED' || $item->status == 'pahr') {
-        $shipped = $item->ed;
-        $odatad[] = array($shipped, $item->tl, $item->lo);
-      }
-      if ($item->status == 'waiting') {
-        if (isset($item->url) && $item->url != '') {
-          $at = _patroninfo_link(t('Get It!'), 'patroninfo-link', $item->url);
-        }
-        else {
-          $at = $item->lo;
-        }
-        $before = $item->ed;
-        $wdatad[] = array($before, $item->tl, $at);
-      }
-      if ($item->status == 'finef') {
-        $am = substr($item->am, 0, strlen -2) . '.' . substr($item->am, -2);
-        $fdatad[] = array($item->ed, $item->tl, $am);
-      }
-    }
-    // end of big loop
-    // cdatad wdatad odatad fdatad have charged to you, waiting for you, on way to you, fines for you
-    $today = date('Y-m-d');
-    $form['item_cindex'] = array(
-      '#type' => 'hidden',
-      '#value' => count($cdatad),
-    );
-    $form['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t('Renew'),
-    );
-    return $form;
-  }
-}
 
 function __erase_cookie_header($cookiename) {
   $backtime = mktime() -36000;
@@ -996,4 +861,12 @@ function __pa_fmt_date($date) {
   $string = preg_replace($pattern, $replacement, $date);
   return $string;
 }
-
+ 
+function __pa_fmt_tl($item) {
+  $xcallno = isset($item->callno) ? $item->callno : '' ;
+  $xau = isset($item->au) ? $item->au : '' ;
+  $ititle = "<span class='pa-item-title'><i>" . $item->tl ."</i></span>" ;
+  $iau = "<span class='pa-item-au'>" . $item->au ."</span>" ;
+  $icallno = "<span class='pa-item-callno'><b>" . $item->callno ."</b></span>" ;
+  return "$iau $ititle $icallno ";
+}
