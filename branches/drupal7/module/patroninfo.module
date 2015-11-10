@@ -646,7 +646,7 @@ function _patroninfo_add_local() {
     $(document).ready(function(){
                       $("#pi-tabs > ul").tabs();
 	              $("#cbottonc").val("Renew marked items");
-		      $(".ui-tabs-nav > li > a").bind("click",function(event)
+		      $(".nav-tabs > li > a").bind("click",function(event)
                       {
                       var t = event.target.textContent;
                       if (!t) t = event.target.innerText;
