@@ -680,8 +680,8 @@ function _patroninfo_add_local() {
     			$("#cbottonc").text("Renew marked Items");
         }
       }
-      $("#frag-0").addClass("active");
     );
+    $("#frag-0").addClass("active");
     });
   });
   ';
