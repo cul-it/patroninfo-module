@@ -648,42 +648,42 @@ function _patroninfo_add_local() {
 	    $("#cbottonc").val("Renew marked items");
 		  $(".nav-tabs > li > a").bind("click",function(event) {
         var t = event.target.textContent;
-        if (!t) t = event.target.innerText;
-        if (t.match("Pending")){
-    			$("#cbottona").hide();
-    			$("#cbotton").show();
-    			$("#cbottond").hide();
-    			$("#cbottonc").val("Cancel marked items");
-    			$("#cbottonc").text("Cancel marked items");
-    			$("#cbottonc").show();
+          if (!t) t = event.target.innerText;
+          if (t.match("Pending")){
+      			$("#cbottona").hide();
+      			$("#cbotton").show();
+      			$("#cbottond").hide();
+      			$("#cbottonc").val("Cancel marked items");
+      			$("#cbottonc").text("Cancel marked items");
+      			$("#cbottonc").show();
+          }
+          if (t.match("Available")){
+      			$("#cbottond").hide();
+      			$("#cbottona").hide();
+      			$("#cbotton").hide();
+      			$("#cbottonc").text("Cancel marked items");
+      			$("#cbottonc").val("Cancel marked items");
+      			$("#cbottonc").show();
+          }
+          if (t.match("Fines") || t.match("Notices")){
+      			$("#cbottonc").hide();
+      			$("#cbottond").hide();
+      			$("#cbotton").hide();
+      			$("#cbottona").hide();
+          }
+          if (t.match("Checked") ){
+      			$("#cbottonc").show();
+      			$("#cbottond").show();
+      			$("#cbotton").show();
+      			$("#cbottona").show();
+      			$("#cbottonc").val("Renew marked items");
+      			$("#cbottonc").text("Renew marked Items");
+          }
         }
-        if (t.match("Available")){
-    			$("#cbottond").hide();
-    			$("#cbottona").hide();
-    			$("#cbotton").hide();
-    			$("#cbottonc").text("Cancel marked items");
-    			$("#cbottonc").val("Cancel marked items");
-    			$("#cbottonc").show();
-        }
-        if (t.match("Fines") || t.match("Notices")){
-    			$("#cbottonc").hide();
-    			$("#cbottond").hide();
-    			$("#cbotton").hide();
-    			$("#cbottona").hide();
-        }
-        if (t.match("Checked") ){
-    			$("#cbottonc").show();
-    			$("#cbottond").show();
-    			$("#cbotton").show();
-    			$("#cbottona").show();
-    			$("#cbottonc").val("Renew marked items");
-    			$("#cbottonc").text("Renew marked Items");
-        }
-      }
-    );
-    $("#frag-0").addClass("active");
+      );
     });
-  });
+      $("#frag-0").addClass("active");
+    });
   ';
 
   drupal_add_js($boiler, array('type' => 'inline', 'group' => JS_DEFAULT));
