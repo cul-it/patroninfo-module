@@ -619,7 +619,7 @@ function _patroninfo_tabs($ptabs) {
     else
       $bc = theme_table($evariables);
     //$bc = theme_table($item[1], $item[0], null, $item[2]);
-    $ul .= "<li role=\"presentation\"><a href=\"#frag-$tabn\" role=\"tab\" data-toggle=\"tab\"><span>" . $item[2] . '(' . $len . ')</span></a></li>' . "\n";
+    $ul .= "<li role=\"presentation\"><a href=\"#frag-$tabn\" role=\"tab\" data-toggle=\"tab\">" . $item[2] . '(' . $len . ')</a></li>' . "\n";
     $tabcontent = "<div class=\"tab-content\">";
     $dv .= "<div id=\"frag-$tabn\" role=\"tabpanel\" class=\"tab-pane\">" . $bc . '</div>' . "\n";
     $tabn++;
@@ -646,7 +646,7 @@ function _patroninfo_add_local() {
     $(document).ready(function(){
       $("#pi-tabs > ul").tabs();
 	    $("#cbottonc").val("Renew marked items");
-		  $(".nav-tabs > li > a > span").bind("click",function(event) {
+		  $(".nav-tabs > li > a ").bind("click",function(event) {
         var t = event.target.textContent;
           if (!t) t = event.target.innerText;
           if (t.match("Pending")){
