@@ -635,7 +635,7 @@ function _patroninfo_tabs($ptabs) {
 function _patroninfo_add_local() {
   drupal_add_css(drupal_get_path('module', 'patroninfo') . '/css/patroninfo-flora.pi.css');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-ui.core.js');
-  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-ui.tabs.js');
+  drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-ui.tabs.js');
   //drupal_add_library('system', 'ui');
   //drupal_add_library('system', 'ui.tabs');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-jquery.js');
