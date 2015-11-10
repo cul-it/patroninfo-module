@@ -581,7 +581,7 @@ function _link($label, $class, $link) {
  *    array($wdatad,array(t('Pickup before'),t('Description'), t('At')),t('Available'));
  */
 function _patroninfo_tabs($ptabs) {
-  $ul = '<div id="pi-tabs" class="xtabs"><ul class="nav nav-tabs acct-tabs" role="tablist">' . "\n";
+  $ul = '<div id="pi-tabs" class="xtabs"><ul class="nav nav-tabs" role="tablist">' . "\n";
   $tabn = 0;
   $dv = '';
 
@@ -646,7 +646,7 @@ function _patroninfo_add_local() {
     $(document).ready(function(){
       $("#pi-tabs > ul").tabs();
 	    $("#cbottonc").val("Renew marked items");
-		  $(".acct-tabs > li > a").bind("click",function(event) {
+		  $(".nav-tabs > li > a > span").bind("click",function(event) {
         var t = event.target.textContent;
           if (!t) t = event.target.innerText;
           if (t.match("Pending")){
