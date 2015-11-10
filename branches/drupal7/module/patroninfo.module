@@ -619,7 +619,7 @@ function _patroninfo_tabs($ptabs) {
     else
       $bc = theme_table($evariables);
     //$bc = theme_table($item[1], $item[0], null, $item[2]);
-    $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . $len . ')</span></a></li>' . "\n";
+    $ul .= "<li role=\"presentation\" class=\"active\"><a href=\"#frag-$tabn\" role=\"tab\" data-toggle=\"tab\"><span>" . $item[2] . '(' . $len . ')</span></a></li>' . "\n";
     $tabcontent = "<div class=\"tab-content\">";
     $dv .= "<div id=\"frag-$tabn\" role=\"tabpanel\" class=\"tab-pane\">" . $bc . '</div>' . "\n";
     $tabn++;
