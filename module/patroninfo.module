@@ -581,7 +581,7 @@ function _link($label, $class, $link) {
  *    array($wdatad,array(t('Pickup before'),t('Description'), t('At')),t('Available'));
  */
 function _patroninfo_tabs($ptabs) {
-  $ul = '<div id="pi-tabs" class="xtabs"><ul class="nav nav-tabs" role="tablist">' . "\n";
+  $ul = '<div id="pi-tabs" class="xtabs"><ul>' . "\n";
   $tabn = 0;
   $dv = '';
 
@@ -619,13 +619,12 @@ function _patroninfo_tabs($ptabs) {
     else
       $bc = theme_table($evariables);
     //$bc = theme_table($item[1], $item[0], null, $item[2]);
-    $ul .= "<li role=\"presentation\"><a href=\"#frag-$tabn\" role=\"tab\" data-toggle=\"tab\"><span>" . $item[2] . '(' . $len . ')</span></a></li>' . "\n";
-    $tabcontent = "<div class=\"tab-content\">";
-    $dv .= "<div id=\"frag-$tabn\" role=\"tabpanel\" class=\"tab-pane\">" . $bc . '</div>' . "\n";
+    $ul .= "<li><a href=\"#frag-$tabn\"><span>" . $item[2] . '(' . $len . ')</span></a></li>' . "\n";
+    $dv .= "<div id=\"frag-$tabn\">" . $bc . '</div>' . "\n";
     $tabn++;
   }
   $ul .= '</ul>';
-  $output = $ul . $tabcontent . $dv . '</div></div>' . "\n";
+  $output = $ul . $dv . '</div>' . "\n";
   return $output;
 }
 
@@ -640,13 +639,12 @@ function _patroninfo_add_local() {
   //drupal_add_library('system', 'ui.tabs');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-jquery.js');
   drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/patroninfo-divheader.js');
-  //drupal_add_js(drupal_get_path('module', 'patroninfo') . '/js/bs-active-tabs.js');
   $boiler = '
   jQuery(function( $ ){
     $(document).ready(function(){
       $("#pi-tabs > ul").tabs();
 	    $("#cbottonc").val("Renew marked items");
-		  $(".nav-tabs > li > a ").bind("click",function(event) {
+		  $(".ui-tabs-nav > li > a ").bind("click",function(event) {
         var t = event.target.textContent;
           if (!t) t = event.target.innerText;
           if (t.match("Pending")){
@@ -682,7 +680,6 @@ function _patroninfo_add_local() {
         }
       );
     });
-      $("#frag-0").addClass("active");
     });
   ';
 
