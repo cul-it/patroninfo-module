@@ -60,7 +60,8 @@ if (isset($_POST['cbotton'])) {
       $data .= citethem($item);
     }
   }
-  sendthem($dest, $data);
+  //sendthem($dest, $data);
+  sendris($dest, $data);
   exit(0);
 }
 
@@ -68,7 +69,8 @@ if (isset($_POST['cbottona'])) {
   foreach ($var->items as $item) {
     $data .= citethem($item);
   }
-  sendthem($dest, $data);
+  //sendthem($dest, $data);
+  sendris($dest, $data);
   exit(0);
 }
 include_once $cdir . '/' . "NCIPc.php";
@@ -139,26 +141,36 @@ header("Location: " . $_SERVER['HTTP_REFERER']);
 exit(0);
 
 function citethem($item) {
-  $type = isset($item->ou_genre) ? $item->ou_genre : 'Book, Whole';
+  $endpunct =' :/?!.,';
+  $type = isset($item->ou_genre) ? $item->ou_genre : 'BOOK';
   $author = isset($item->ou_aulast) ? $item->ou_aulast : (isset($item->au) ? $item->au : "");
   $title = isset($item->ou_title) ? $item->ou_title : (isset($item->title) ? $item->title : "");
   $isbn = isset($item->ou_isbn) ? $item->ou_isbn : (isset($item->isbn) ? $item->isbn : "");
   $lang = isset($item->ou_lang) ? $item->ou_lang : (isset($item->lang) ? $item->lang : "English");
   if (isset($item->ou_pp)) {
-    $citation['PP'] = $item->ou_pp;
-    $citation['YR'] = $item->ou_yr;
-    $citation['PB'] = $item->ou_pb;
+    $citation['CY'] = trim($item->ou_pp,$endpunct);
+    $citation['PY'] = trim($item->ou_yr,$endpunct);
+    $citation['PB'] = trim($item->ou_pb,$endpunct);
   }
 
-  $type = "\r\nRT  " . $type . "\r\n";
-  $citation['T1'] = $title;
-  $citation['A1'] = $author;
+  $type = "TY  - " . $type . "\r\n";
+  $citation['T1'] = trim($title,$endpunct);
+  $citation['AU'] = trim($author,$endpunct);
   $citation['SN'] = $isbn;
   $citation['LA'] = $lang;
   $data = $type;
   foreach ($citation as $tag => $value) {
-    $data .= $tag . ' ' . $value . "\r\n";
+    $data .= $tag . '  - ' . $value . "\r\n";
+  } 
+  if (isset($item->bid) ) {
+    $value = "http://newcatalog.library.cornell.edu/catalog/" . $item->bid ;
+    $data .= 'UR'  . '  - ' . $value . "\r\n";
   }
+  if (isset($item->callno) ) {
+    $value = $item->callno ;
+    $data .= 'C1'  . '  - ' . $value . "\r\n";
+  }
+  $data .= "ER  - \r\n";
   return $data;
 }
 
@@ -173,6 +185,13 @@ function sendthem($dest, $data) {
   echo "</body>";
   echo "</html>";
 }
+
+function sendris($dest,$data)  {
+header("Content-Type: application/x-Research-Info-Systems");
+header('Content-Disposition: attachment; filename="citation.ris"');
+  echo $data ;
+}
+
 
 
 function renews($requested, $auths) {
