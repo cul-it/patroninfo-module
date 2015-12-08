@@ -763,18 +763,24 @@ function __set_cookie_header($cookiename, $value) {
 }
 
 function __build_cite_link(&$item) {
+  $base = '';
+  //#return $base;
   if ($item->system != 'illiad') {
     $genre = 'Book';
   }
   else {
     $genre = $item->ou_genre;
   }
+  $callnos = "";
+  if (isset($item->callno)) {
+    $callnos = '&ou_callno=' . urlencode($item->callno)  ;
+  }
   $pubs = "";
   if (isset($item->ou_pp)) {
     $pubs = '&ou_pb=' . urlencode($item->ou_pb) . '&ou_pp=' . urlencode($item->ou_pp) . '&ou_yr=' . urlencode($item->ou_yr);
   }
   $isbn = isset($item->ou_isbn)? ('&ou_isbn=' . urlencode($item->ou_isbn)): '' ;
-  $base = "<a class='patroninfo-export' target='_refworks' href=" . base_path() . drupal_get_path('module', 'patroninfo') . '/citation.php?' . 'ou_aulast=' . urlencode($item->ou_aulast) . '&ou_genre=' . urlencode($genre) . '&ou_title=' . urlencode($item->ou_title) . $isbn . '>Export to RefWorks</a>';
+  $base = "<a class='patroninfo-export' target='_ris' href=" . base_path() . drupal_get_path('module', 'patroninfo') . '/ris.php?' . 'ou_aulast=' . urlencode($item->ou_aulast) . '&ou_genre=' . urlencode($genre) . '&ou_title=' . urlencode($item->ou_title) . $isbn . $pubs . $callnos . '>Export as citation format.</a>';
   //$base .= "<span class='cite'>Cite</span><span class='cbox'>CBOX</span>";
   return $base;
 }
