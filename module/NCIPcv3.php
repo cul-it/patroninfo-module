@@ -375,6 +375,8 @@ class NCIPcv3 extends NCIPvx {
 
 // renewitem modified to directly use voyager services.
  public function renewitem($id,$uid=NULL,$date=NULL) {
+    global $errors;
+    global $not_renews;
     $pid = $this->pid;
     $homedb = _vxwsdbid();
     if ($id == 'all') {
@@ -385,7 +387,7 @@ class NCIPcv3 extends NCIPvx {
     $request = _vxws() . "/vxws/patron/$pid/circulationActions/loans/$thomedb?patron_homedb=$homedb";
     if ( $date != NULL ) {
     }
-    if ($this->trace) $this->general($request);
+    if ($this->trace) $this->general(__FILE__ . ':' . __LINE__ . ':' . $request);
     $opts = array(
     'http'=>array(
     'method'=>"POST",
@@ -393,9 +395,12 @@ class NCIPcv3 extends NCIPvx {
               "Cookie: foo=bar\r\n"
      )
      );
-     $context = stream_context_create($opts);
+    $context = stream_context_create($opts);
     $buf2 = file_get_contents($request, false, $context);
-    if ($this->get_trace()) $this->general($buf2);
+    if ($id == '8970277' ) {
+    $buf2 = '<?xml version="1.0" encoding="UTF-8"?><response><reply-text>ok</reply-text><reply-code>0</reply-code><renewal><institution id="LOCAL"><instName>Cornell University Library</instName><loan canRenew="N" loanid="1@CORNELLDB20021226150546|8970277"><itemId>8970277</itemId><itemBarcode>31924080321346</itemBarcode><dueDate>2016-01-20 17:00</dueDate><origDueDate>2016-01-14 17:00</origDueDate><todaysDate>2016-01-13 14:44</todaysDate><title>Treme. The complete first season [videorecording] / produced by Anthony Hemingway ; created by David Simon &amp; Eric Overmyer ; Blown Deadline Productions ; a presentation of Home Box Office.</title><author xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/><location>Africana Library (Africana Center)</location><locationCode>afr</locationCode><callNumber>Videodisc 583</callNumber><statusCode>3</statusCode><statusText>Renewed (Requests: 0)</statusText><itemtype>visual</itemtype><dbKey>1@CORNELLDB20021226150546</dbKey><dbName>Cornell University Library</dbName><renewalStatus>Renew not allowed</renewalStatus><renewalStatusCode>N</renewalStatusCode></loan></institution></renewal></response>';
+    }
+    if ($this->trace) $this->general(__FILE__ .  ':'  . __LINE__ . ':' . $buf2);
     try {
     $doc = new SimpleXmlElement($buf2, LIBXML_NOCDATA);
     } 
@@ -403,19 +408,25 @@ class NCIPcv3 extends NCIPvx {
     $doc = new SimpleXmlElement(
          "<Problem><ErrorCode>500</ErrorCode><ErrorMessage>Communication Error</ErrorMessage></Problem>", LIBXML_NOCDATA);
     }
+
     $result = $doc->xpath('//reply-code');
-    $error = 0;
+    $msg_error = 0;
     while(list( , $node) = each($result)) {
-    $error = $node;
+      $msg_error = $node;
     }
     $result = $doc->xpath('//reply-text');
     while(list( , $node) = each($result)) {
-    $errortext = $node;
+      $errortext = $node;
     }
-    if ($error ==  '0') {
+    if ($this->trace) $this->general(__FILE__ . ':' . __LINE__ . ':' . print_r($result,TRUE));
+    foreach ($doc->renewal->institution->loan as $loan) {
+      if ($loan->renewalStatus  != 'Success')
+        $errors .= '*' . $loan->itemId . '|' . $loan->renewalStatus  ;
+    }
+    if ($msg_error ==  '0') {
        $doc = new SimpleXmlElement("<NCIPMessage/>"); 
     }
-    if ($error !=  '0') {
+    if ($msg_error !=  '0') {
        $doc = new SimpleXmlElement(
          "<Problem><ErrorCode>$error</ErrorCode><ErrorMessage>$errortext</ErrorMessage></Problem>", LIBXML_NOCDATA);
     }

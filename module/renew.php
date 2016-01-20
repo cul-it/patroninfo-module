@@ -99,6 +99,7 @@ $canceledtt = array();
 $requested = array();
 
 $errors = '';
+$not_renews = '';
 
 //if ($renewablec > 0 && $requestc>0 )  $r = implode(',',$requested);
 for ($i = 0; $i < $cancelc; $i++) {
@@ -129,13 +130,14 @@ for ($i = 0; $i < $renewablec; $i++) {
 renews($requested, $auths);
 cancels($canceled, $auths, $canceledt, $canceledtt);
 
+  setcookie('pimessage', $errors, time()+10, '/', $_SERVER['SERVER_NAME']);
 if ($errors) {
   //setcookie('pimessage', $errors, 0, '/', $_SERVER['SERVER_NAME']);
 }
 else {
   //setcookie('pimessage', '', 0, '/', $_SERVER['SERVER_NAME']);
 }
-setcookie('pimessage', '', 0, '/', $_SERVER['SERVER_NAME']);
+//setcookie('pimessage', '', 0, '/', $_SERVER['SERVER_NAME']);
 setcookie('renewuser', $netid, 0, '/', $_SERVER['SERVER_NAME']);
 header("Location: " . $_SERVER['HTTP_REFERER']);
 exit(0);
@@ -199,6 +201,7 @@ function renews($requested, $auths) {
   global $nciptypes;
   global $ncipservers;
   global $errors;
+  global $not_renews;
 
   if (count($requested)) {
     foreach ($requested as $sysa => $ids) {
