@@ -30,7 +30,8 @@ function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings
   $cdatad = array();
   $wdata = $deny_msg = $acc_trouble_msg = ''; 
-  $odata =  $fdata = $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; // jgr25 eliminate php notices pimessage
+  // jgr25 eliminate php notices pimessage
+  $odata =$fdata = $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; 
   switch ($delta) {
     case 'patroninfo':
       //dpm(drupal_get_library('system'));
@@ -43,6 +44,7 @@ function patroninfo_block_view($delta) {
         unset($_COOKIE['netid']);
       }
       $actualnetid = $netid;
+      //if ($netid == 'es287'){$netid = 'jk2637';} // bd due. 
       //if ($netid == 'es287'){$netid = 'mls5';} // lots of stuff 
       //if ($netid == 'es287'){$netid = 'dmf22';} // user has blocks.
       //if ($netid == 'es287'){$netid = 'ajs17';}
@@ -105,12 +107,15 @@ function patroninfo_block_view($delta) {
         if (isset($_COOKIE['pimessage'])) {
           $pimessage = $_COOKIE['pimessage'];
           $pims = explode('*', $pimessage);
+          print_r($pimessage); 
           foreach ($pims as $item) {
             $itema = explode("|", $item);
             $pima[$itema[0]] = $itema;
           }
-          __erase_cookie_header('pimessage');
         }
+        //unset($_COOKIE['pimessage']);
+        // __erase_cookie_header('pimessage');
+        //setcookie("pimessage", "", 0);
         $api_blocks = '';
         $rdenied = 'N';
         $rbc = $var->patron->bc;
@@ -267,6 +272,7 @@ function patroninfo_block_view($delta) {
               $visdue = ' <span class="patroninfo-today">* TODAY ' . $visdue . $time . '</span>.';
             }
             // create the form element
+            $bd_note = "";
             $msg = '';
             if ($item->system == 'illiad') {
               if (isset($pima["$item->ii"])) {
@@ -275,11 +281,11 @@ function patroninfo_block_view($delta) {
             }
             else {
               if (isset($pima["$item->iid"])) {
-                $msg = $pima["$item->iid"][2];
+                $msg = $pima["$item->iid"][1];
               }
             }
             if (!($item->system == 'borrowdirect') && !($disabled)) {
-              if (($item->system == 'illiad' && $item->ra == 'Yes') || ($item->system != 'illiad')) {
+              if (($item->system == 'illiad' && $item->ra == 'Yes') || ($item->system != 'illiad' && $item->lo != '') || ($item->system != 'illiad' && $item->lo == '' && $item->renewal_count < 1)) {
                 $k = 'item_' . $cindex . '_renew';
                 $form[$k] = array(
                   '#id' => $k,
@@ -287,20 +293,31 @@ function patroninfo_block_view($delta) {
                   '#type' => 'checkbox',
                   '#return_value' => $item->system . ':' . ($item->system == 'illiad' ? $item->ii : $item->iid),
                 );
+              } else {
+                if ($item->system != 'illiad' && $item->lo == '' && $item->renewal_count > 0 ) {
+                  $k = 'bd_' . $cindex . '_at_max';
+                  $form[$k] = array(
+                  '#type' => 'markup',
+                  '#markup' =>  '<span class="patroninfo-bd-cantrenew"><i>Note: This Borrowdirect item is not eligible for renewal.</i> </span>'
+                );
+                  //$bd_note = '<span class="patroninfo-bd-cantrenew"><i>Note: This Borrowdirect item is not eligible for renewal.</i> </span>';
+                }
               }
               $r = drupal_render($form[$k]);
             }
             else {
               if (!$disabled) {
-                $r = '<span class="patroninfo-cantrenew"> cannot renew borrowdirect items</span>';
+                if ($item->system != 'illiad' && $item->lo == '' && $item->renewal_count > 0 ) {
+                  $bd_note = '<span class="patroninfo-bd-cantrenew"><i>Note: This Borrowdirect item is not eligible for renewal.</i></span>';
+                }
               }
               else {
-                $r = '<span class="patroninfo-disabled"></span>';
+                $bd_note = '<span class="patroninfo-disabled"></span>';
               }
             }
             $r .= $msg; //. __build_cite_link($item);
             //$cdatad[]= array($due,$r.$item->tl . t('Location:').$item->lo.". $note",'');
-            $cdatad[] = array($r, $visdue, __pa_fmt_tl($item)  . t('Location:') . $item->lo . ". $note" . __build_cite_link($item) . __build_coins($item), '');
+            $cdatad[] = array($r , $visdue, __pa_fmt_tl($item)  . t('Location:') . $item->lo . ". $note $bd_note" . __build_cite_link($item) . __build_coins($item), '');
             $scdatad[] = array(
               'index' => $cindex++,
               'due' => $due,
@@ -410,7 +427,10 @@ function patroninfo_block_view($delta) {
         if ($disabled) {
           $you .= "<i>Note</i>: &nbsp; $acc_trouble_msg $conmsg";
         }
-        $ecount = count($pima) > 0 ? count($pima) -1 . " errors" : "";
+        $ecount = count($pima) > 1 ? "There were " . (count($pima) -1 ) . " renewal errors." : "";
+        if ($ecount) {
+          $you .= "<i>Note</i>: &nbsp; $ecount";
+        }
         //$wmsg = "Please note -- the Voyager catalog will be in read-only mode during software upgrade from the morning of Monday Dec 24 2012 until the morning of Wed. Jan 2 2013.  Users of the catalog will not be able to renew items, do holds, recalls, and delivery requests.  Returned items will not appear as returned until full production returns.";
 
         // $blocks['content'] = "<h2>$wmsg</h2> <h3 id='patroninfoid' class='patroninfo-title'>" . t('Account information for') . " $you // $ecount </h3>";
@@ -438,8 +458,9 @@ function patroninfo_block_view($delta) {
         $blocks['content']  .= drupal_render($form); 
         //$blocks['content'] .= __build_refbox() ;
         $fs = '';
+        //if (1) {
         if (variable_get('patroninfo_debug', 0)) {
-          $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>" . print_r($pima, TRUE) . print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
+          $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>pima:" . print_r($pima, TRUE) . "<br/>pimessage:$pimessage<br/>". print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
         }
         return $blocks;
       }
@@ -752,7 +773,7 @@ function __erase_cookie_header($cookiename) {
   $tmpstring = $_COOKIE[$cookiename];
   //$tmpstring = urlencode($tmpstring);
   drupal_add_http_header("Set-Cookie",
-  "Set-Cookie: $cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=" . $_SERVER['SERVER_NAME']);
+  "$cookiename=$tmpstring; expires=$backdate GMT; path=/;domain=" . $_SERVER['SERVER_NAME']);
 }
 function __set_cookie_header($cookiename, $value) {
   $backtime = mktime() + 36000;
