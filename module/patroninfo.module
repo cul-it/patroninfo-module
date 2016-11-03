@@ -241,7 +241,7 @@ function patroninfo_block_view($delta) {
         $form['#id'] = 'renewform';
         $form['#name'] = 'renewform';
         $form['#method'] = 'post';
-        $form['#action'] = url('sites/all/modules/custom/patroninfo/renew.php');
+        $form['#action'] = url(drupal_get_path('module', 'patroninfo').'/renew.php');
         $form['#attributes'] = array('enctype' => 'multipart/form-data',);
         //$hidden .= drupal_render($form);
         foreach ($var->items as $item) {
@@ -460,7 +460,8 @@ function patroninfo_block_view($delta) {
         $fs = '';
         //if (1) {
         if (variable_get('patroninfo_debug', 0)) {
-          $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>pima:" . print_r($pima, TRUE) . "<br/>pimessage:$pimessage<br/>". print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
+          $action_url = url(drupal_get_path('module', 'patroninfo').'/renew.php');
+          $blocks['content'] .= "ACTION: $action_url URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>pima:" . print_r($pima, TRUE) . "<br/>pimessage:$pimessage<br/>". print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
         }
         return $blocks;
       }
