@@ -10,6 +10,7 @@ $patroninfo_data;
 define('DEFAULT_API', 'http://wwwdev.library.cornell.edu/cgi-bin/ilsapi2.cgi?netid=');
 define('OTHER_USER', 'see other users library accounts');
 define('CONFIGURE_ILS', 'configure ils api feeds');
+define('RDONLY_MSG', "Due to system maintenance, renewal and request cancellation are not available");
 
 /**
  * Implements hook_block_info().
@@ -30,6 +31,10 @@ function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings
   $cdatad = array();
   $wdata = $deny_msg = $acc_trouble_msg = ''; 
+  $rdonly = variable_get('patroninfo_rdonly', 'N'); 
+  $rdonly_default_msg = "Due to system maintenance, renewal and request cancellation are not available";
+  $rdonly_msg = ($rdonly == 0) ? "" : $rdonly_default_msg;
+  $rdonly  = ($rdonly == 0) ? 'N'  : 'Y';
   // jgr25 eliminate php notices pimessage
   $odata =$fdata = $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; 
   switch ($delta) {
@@ -228,7 +233,7 @@ function patroninfo_block_view($delta) {
           );
         }
         $disabled = 1;
-        if ($var->patron->status != 'Active' || $rdenied == 'Y') {
+        if ($var->patron->status != 'Active' || $rdenied == 'Y' || $rdonly == 'Y')  {
           $disabled = 1;
         }
         else {
@@ -241,7 +246,7 @@ function patroninfo_block_view($delta) {
         $form['#id'] = 'renewform';
         $form['#name'] = 'renewform';
         $form['#method'] = 'post';
-        $form['#action'] = url('sites/all/modules/custom/patroninfo/renew.php');
+        $form['#action'] = url(drupal_get_path('module', 'patroninfo').'/renew.php');
         $form['#attributes'] = array('enctype' => 'multipart/form-data',);
         //$hidden .= drupal_render($form);
         foreach ($var->items as $item) {
@@ -422,7 +427,7 @@ function patroninfo_block_view($delta) {
         //$you=($var->patron->last)?($var->patron->given.' '.$var->patron->last):$netid;
         // if ($var->patron->status != 'Active' ) { $you .= '.&nbsp; <i>Note</i>: &nbsp; your account has expired; please <a href="mailto:libpublicservices@cornell.edu">contact the library</a> for assistance.' ; $disabled = 1;}
         $conmsg = "Please <a href=\"mailto:libpublicservices@cornell.edu\">contact the library</a> for assistance.";
-        $voyblocks = ($rdenied == 'Y') ? "<br/>$rblock_msg  $deny_msg" : "";
+        $voyblocks = (($rdenied == 'Y')  || ($rdonly == 'Y'))? "<br/>$rblock_msg  $deny_msg $rdonly_msg " : "";
         $you = (($var->patron->last) ? ($var->patron->given . ' ' . $var->patron->last) : $netid) . $voyblocks;
         if ($disabled) {
           $you .= "<i>Note</i>: &nbsp; $acc_trouble_msg $conmsg";
@@ -460,7 +465,8 @@ function patroninfo_block_view($delta) {
         $fs = '';
         //if (1) {
         if (variable_get('patroninfo_debug', 0)) {
-          $blocks['content'] .= "URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>pima:" . print_r($pima, TRUE) . "<br/>pimessage:$pimessage<br/>". print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
+          $action_url = url(drupal_get_path('module', 'patroninfo').'/renew.php');
+          $blocks['content'] .= "ACTION: $action_url URL:$url<br/>renew user ($renew_user). FORM STATE= $fs<br/>$stuff<br/>pima:" . print_r($pima, TRUE) . "<br/>pimessage:$pimessage<br/>". print_r($_SESSION, TRUE) . print_r($_REQUEST, TRUE) . print_r("<br/>POST DATA ", TRUE) . print_r($_POST, TRUE) . print_r("<br/>Session id is " . session_id(), TRUE) . print_r("<br/>Session name is " . session_name(), TRUE);
         }
         return $blocks;
       }
@@ -526,6 +532,12 @@ function patroninfo_admin_settings($form, &$form_state) {
     '#title' => t('Show debug info'),
     '#default_value' => variable_get('patroninfo_debug', 0),
     '#description' => t('Show debug info'),
+  );
+  $form['patroninfo_rdonly'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('System is in readonly'),
+    '#default_value' => variable_get('patroninfo_rdonly', 'N'),
+    '#description' => t('Put system into readonly'),
   );
   $form['#submit'] = array('patroninfo_admin_settings_submit');
 
