@@ -32,6 +32,7 @@ function patroninfo_block_view($delta) {
   $cdatad = array();
   $wdata = $deny_msg = $acc_trouble_msg = ''; 
   $rdonly = variable_get('patroninfo_rdonly', 'N'); 
+  $rblock_msg = ''; 
   $rdonly_default_msg = "Due to system maintenance, renewal and request cancellation are not available";
   $rdonly_msg = ($rdonly == 0) ? "" : $rdonly_default_msg;
   $rdonly  = ($rdonly == 0) ? 'N'  : 'Y';
