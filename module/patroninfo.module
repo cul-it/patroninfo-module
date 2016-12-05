@@ -29,6 +29,7 @@ function patroninfo_block_info() {
  */
 function patroninfo_block_view($delta) {
   // TODO Rename block deltas (e.g. delta-0) to readable strings
+  $r = '';
   $cdatad = array();
   $wdata = $deny_msg = $acc_trouble_msg = ''; 
   $rdonly = variable_get('patroninfo_rdonly', 'N'); 
