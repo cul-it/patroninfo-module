@@ -906,10 +906,11 @@ function __pa_fmt_date($date) {
 }
  
 function __pa_fmt_tl($item) {
+  $xtitle = isset($item->tl) ? $item->tl : '' ;
   $xcallno = isset($item->callno) ? $item->callno : '' ;
   $xau = isset($item->au) ? $item->au : '' ;
-  $ititle = "<span class='pa-item-title'><i>" . $item->tl ."</i></span>" ;
-  $iau = "<span class='pa-item-au'>" . $item->au ."</span>" ;
-  $icallno = "<span class='pa-item-callno'><b>" . $item->callno ."</b></span>" ;
+  $ititle = "<span class='pa-item-title'><i>" . $xtitle ."</i></span>" ;
+  $iau = "<span class='pa-item-au'>" . $xau ."</span>" ;
+  $icallno = "<span class='pa-item-callno'><b>" . $xcallno ."</b></span>" ;
   return "$iau $ititle $icallno ";
 }
