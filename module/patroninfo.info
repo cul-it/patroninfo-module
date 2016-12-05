@@ -4,3 +4,5 @@ description = show information about a patron
 core = 7.x
 php = 5.2
 package = Cornell University Library
+configure = admin/config/content/patroninfo
+

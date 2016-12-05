@@ -495,7 +495,7 @@ function patroninfo_block_OLD($op = 'list', $delta = 0, $edit = array()) {
  */
 function patroninfo_menu() {
   $items = array();
-  $items['admin/config/patroninfo'] = array(
+  $items['admin/config/content/patroninfo'] = array(
     'title' => t('ILS api client'),
     'description' => t('Configure settings for ils api.'),
     'page callback' => 'drupal_get_form',
@@ -578,6 +578,7 @@ function patroninfo_admin_settings_validate(&$form, $form_state) {
 function patroninfo_admin_settings_submit($form, &$form_state) {
   variable_set('patroninfo_target', $form_state['values']['patroninfo_template']);
   variable_set('patroninfo_debug', $form_state['values']['patroninfo_debug']);
+  variable_set('patroninfo_rdonly', $form_state['values']['patroninfo_rdonly']);
 }
 
 /**
