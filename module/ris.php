@@ -6,9 +6,9 @@ $title=urldecode($_GET['ou_title']);
 $isbn=urldecode($_GET['ou_isbn']);
 $lang = isset($_GET['ou_lang'])? $_GET['ou_lang']: 'English';
 if (isset($_GET['ou_pp']) ) {
-  $citation['CY']=trim($_GET['ou_pp'],$endpunt);
+  $citation['CY']=trim($_GET['ou_pp'],$endpunct);
   $citation['PY']=$_GET['ou_yr'];
-  $citation['PB']=trim($_GET['ou_pb'],$endpunt);
+  $citation['PB']=trim($_GET['ou_pb'],$endpunct);
 }
 
 $type = "TY  - ".$type . "\r\n";
