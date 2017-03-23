@@ -305,7 +305,7 @@ function patroninfo_block_view($delta) {
                   $k = 'bd_' . $cindex . '_at_max';
                   $form[$k] = array(
                   '#type' => 'markup',
-                  '#markup' =>  '<span class="patroninfo-bd-cantrenew"><i>Note: This Borrowdirect item is not eligible for renewal.</i> </span>'
+                  '#markup' =>  '<span class="patroninfo-bd-cantrenew"><i>Note: This Borrow Direct book has been renewed. It is not eligible for further renewals.</i> </span>'
                 );
                   //$bd_note = '<span class="patroninfo-bd-cantrenew"><i>Note: This Borrowdirect item is not eligible for renewal.</i> </span>';
                 }
