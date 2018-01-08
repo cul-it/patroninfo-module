@@ -46,9 +46,19 @@ function patroninfo_block_view($delta) {
       // views_add_css('admin'); jgr25 trial remove for Drupal7
       _patroninfo_add_local();
       // $ts = new views_tabset; jgr25 trial remove for Drupal7
-      $netid = cu_authenticate();
-      if ($_COOKIE['netid']) { // make sure netid is never stale.
-        unset($_COOKIE['netid']);
+      if (module_exists('cu_webauth')) {
+        $netid = cu_authenticate();
+        if ($_COOKIE['netid']) { // make sure netid is never stale.
+          unset($_COOKIE['netid']);
+        }
+      else if (module_exists('simplesamlphp_auth')) {
+        $auth = new SimpleSAML_Auth_Simple('default-sp');
+        $auth->requireAuth();
+        $attrs = $auth->getAttributes();
+        dpm($attrs, 'simplesaml attributes');
+      }
+      else {
+        $netid = '';
       }
       $actualnetid = $netid;
       //if ($netid == 'es287'){$netid = 'jk2637';} // bd due. 
