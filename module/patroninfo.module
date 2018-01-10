@@ -618,6 +618,9 @@ function patroninfo_permission() {
       'title' => t(OTHER_USER),
       'description' => t('TODO Add a description for OTHER_USER'),
     ),
+    'login to patroninfo' => array(
+      'title' => t('Access Patroninfo Login Page'),
+    ),
   );
 }
 
