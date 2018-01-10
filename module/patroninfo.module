@@ -112,6 +112,10 @@ function patroninfo_block_view($delta) {
       //if ($netid == 'es287'){$netid = 'kjh10';}
       //if ($netid == 'es287'){$netid = 'uak4';}
       //if ($netid == 'es287'){$netid = 'jgr25';}
+      if (empty($netid)) {
+        $target = url('/myacct', array('alias' => TRUE, 'absolute' => TRUE));
+        drupal_goto($target);
+      }
       $renew_user = '';
       if (user_access(OTHER_USER)) {
         $renewsessionname = $_COOKIE['renewsession'];
