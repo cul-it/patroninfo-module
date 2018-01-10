@@ -34,6 +34,8 @@ function patroninfo_block_info() {
   $blocks['patroninfo']['cache'] = DRUPAL_NO_CACHE;
   $blocks['patroninfo-renew']['info'] = t('PatronInfo Renew');
   $blocks['patroninfo-renew']['cache'] = DRUPAL_NO_CACHE;
+  $blocks['patroninfo-login-visit']['info'] = t('Login or Visit My Account');
+  $blocks['patroninfo-login-visit']['cache'] = DRUPAL_NO_CACHE;
   return $blocks;
 }
 
@@ -53,6 +55,21 @@ function patroninfo_block_view($delta) {
   // jgr25 eliminate php notices pimessage
   $odata =$fdata = $ndatad = $fdatad = $odatad = $wdatad = $wmsg = $pima = $cdata = $pimessage = ''; 
   switch ($delta) {
+    case 'patroninfo-login-visit':
+      $blocks['subject'] = t('<h3>Renew your books and check the status of your requests</h3>');
+      $blocks['content'] = '';
+      if (user_is_logged_in()) {
+        $blocks['content'] .= t('<a class="btn btn-cul" href="/myacctpage">Check your account information</a>');        
+      }
+      else {
+        $blocks['content'] .= t('<a class="btn btn-cul" href="/patroninfo/login">Login with your NetID or GuestID »</a>');        
+        $blocks['content'] .= '<ul>';
+        $blocks['content'] .= t('<li>Cornell students, faculty and staff: use <strong>NetID</strong></li>');
+        $blocks['content'] .= t('<li>Guest Borrowers (Library Card, Privilege Card and SUNY Card holders): use <strong>GuestID</strong> (contact the <a href="mailto:libpublicservices@cornell.edu">Library Public Services office</a> about obtaining a GuestID)</li>');       
+        $blocks['content'] .= '</ul>';
+      }
+      return $blocks;
+      break;
     case 'patroninfo':
       //dpm(drupal_get_library('system'));
       // views_include("tabs"); jgr25 trial remove for Drupal7
