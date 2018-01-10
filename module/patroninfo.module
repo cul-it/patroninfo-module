@@ -559,6 +559,12 @@ function patroninfo_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['patroninfo/login'] = array(
+    'title' => 'Patroninfo login',
+    'page callback' => '_patroninfo_login_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
