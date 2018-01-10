@@ -81,11 +81,15 @@ function patroninfo_block_view($delta) {
         if ($_COOKIE['netid']) { // make sure netid is never stale.
           unset($_COOKIE['netid']);
         }
+      }
       else if (module_exists('simplesamlphp_auth')) {
         $auth = new SimpleSAML_Auth_Simple('default-sp');
-        $auth->requireAuth();
+        $target = url('/myacct', array('alias' => TRUE, 'absolute' => TRUE));
+        $auth->requireAuth(array('ReturnTo' => $target));
         $attrs = $auth->getAttributes();
-        dpm($attrs, 'simplesaml attributes');
+        $email = $attrs['mail'][0];
+        $netid = substr($email, 0, strpos($email, '@'));
+        $full_name = $attrs['displayName'][0];
       }
       else {
         $netid = '';
