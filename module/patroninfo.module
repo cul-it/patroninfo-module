@@ -20,7 +20,7 @@ function _patroninfo_login_page() {
   drupal_goto($target);
 }
 
-define('DEFAULT_API', 'http://wwwdev.library.cornell.edu/cgi-bin/ilsapi2.cgi?netid=');
+define('DEFAULT_API', 'https://voy-api.library.cornell.edu/cgi-bin/ilsapiE.cgi?netid=');
 define('OTHER_USER', 'see other users library accounts');
 define('CONFIGURE_ILS', 'configure ils api feeds');
 define('RDONLY_MSG', "Due to system maintenance, renewal and request cancellation are not available");
