@@ -173,6 +173,7 @@ function patroninfo_block_view($delta) {
         if (strlen($url) < 7) {
           $url = DEFAULT_API . $netid;
         }
+        $url = _patroninfo_myacct_credentials($url);
         $stuff = file_get_contents($url);
         // the json decode gets all twisted up if the json is not utf-8,
         // and if it contains tabs.
@@ -646,7 +647,7 @@ function patroninfo_permission() {
     ),
     OTHER_USER => array(
       'title' => t(OTHER_USER),
-      'description' => t('TODO Add a description for OTHER_USER'),
+      'description' => t('Access Patroninfo for users other than yourself'),
     ),
     'login to patroninfo' => array(
       'title' => t('Access Patroninfo Login Page'),
