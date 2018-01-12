@@ -26,6 +26,36 @@ define('CONFIGURE_ILS', 'configure ils api feeds');
 define('RDONLY_MSG', "Due to system maintenance, renewal and request cancellation are not available");
 
 /**
+ * add user:password to voyager api credentials
+ */
+function _patroninfo_myacct_credentials($url) {
+  global $conf;
+  if (!empty($conf['myacct-services-credentials'])) {
+    // add user:password for web service
+    $cred = $conf['myacct-services-credentials']; // array('usr' => 'password');
+    $parts = parse_url($url);
+    $parts['pass'] = reset($cred);
+    $parts['user'] = key($cred);
+    $nurl = _patroninfo_unparse_url($parts);
+    return $nurl;
+  }
+  return $url;
+}
+
+function _patroninfo_unparse_url($parsed_url) {
+  $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+  $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+  $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+  $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+  $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+  $pass     = ($user || $pass) ? "$pass@" : '';
+  $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+  $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+  $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+  return "$scheme$user$pass$host$port$path$query$fragment";
+}
+
+/**
  * Implements hook_block_info().
  */
 function patroninfo_block_info() {
