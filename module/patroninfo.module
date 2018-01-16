@@ -117,8 +117,14 @@ function patroninfo_block_view($delta) {
         $target = url('/myacct', array('alias' => TRUE, 'absolute' => TRUE));
         $auth->requireAuth(array('ReturnTo' => $target));
         $attrs = $auth->getAttributes();
-        $email = $attrs['mail'][0];
-        $netid = substr($email, 0, strpos($email, '@'));
+        if (false) {
+          // this seems to return vanity email addresses
+          $email = $attrs['mail'][0];
+          $netid = substr($email, 0, strpos($email, '@'));
+        }
+        else {
+          $netid = $attrs['uid'];
+        }
         $full_name = $attrs['displayName'][0];
       }
       else {
