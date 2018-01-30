@@ -268,10 +268,22 @@ class NCIPcv4 extends NCIPvx {
  }
  public function cancelrequestitem($id,$uid=NULL, $tid=NULL,$type=NULL) {
     $uid = $this->username;
-    $request = _ill() . "/illcancel.cgi?netid=$uid&iid=$id";
+    $request = _ill() . "illcancel.cgi?netid=$uid&iid=$id";
     if ($this->trace) $this->general($request);
-    $buf2 = file_get_contents($request);
-    if ($this->get_trace()) $this->general($buf2);
+    //error_reporting( E_ALL | E_NOTICE | E_STRICT | E_DEPRECATED); 
+    //$buf2 = file_get_contents($request);
+    $buf2 =$this->get_data($request);
+    if ($this->get_trace()) $this->general("cancel response:" . $buf2 . " end of response.");
+    if ($buf2 === false) 
+    { 
+    // treat error 
+       error_log("NCIP error (cancel):\n", 3, "/tmp/myaccount-ncip-errors.log");
+       if ($this->get_trace()) $this->general("cancel response" . $buf2 . " was an error.");
+       $doc = new SimpleXmlElement(
+         "<Problem><ErrorCode>500</ErrorCode><ErrorMessage>Communication Error</ErrorMessage></Problem>", LIBXML_NOCDATA);
+       return $doc;
+    }
+    if ($this->get_trace()) $this->general("cancel response:" . $buf2 . " end of response.");
     $doc = json_decode($buf2);
     if (empty($doc)) {
        $doc = new SimpleXmlElement(
@@ -338,9 +350,18 @@ class NCIPcv4 extends NCIPvx {
 // renewitem modified to directly use voyager services.
  public function renewitem($id,$uid=NULL,$date=NULL) {
     $uid = $this->username;
-    $request = _ill() . "/illrenew.cgi?netid=$uid&iid=$id";
+    $request = _ill() . "illrenew.cgi?netid=$uid&iid=$id";
     if ($this->trace) $this->general($request);
-    $buf2 = file_get_contents($request);
+    //$buf2 = file_get_contents($request);
+    $buf2 = $this->get_data($request);
+    if ($this->get_trace()) $this->general("renew response:" . $buf2 . " end of response.");
+    if ($buf2 === false) { 
+       error_log("NCIP error (renew):\n", 3, "/tmp/myaccount-ncip-errors.log");
+       if ($this->get_trace()) $this->general("renew response" . $buf2 . " was an error.");
+       $doc = new SimpleXmlElement(
+         "<Problem><ErrorCode>500</ErrorCode><ErrorMessage>Communication Error</ErrorMessage></Problem>", LIBXML_NOCDATA);
+       return $doc;
+    }
     if ($this->get_trace()) $this->general($buf2);
     $doc = json_decode($buf2);
     if (empty($doc)) {
@@ -436,4 +457,25 @@ class NCIPcv4 extends NCIPvx {
  $this->crcdom =  simplexml_load_file(ncipcv2::crctmp);
  $this->xgadom =  simplexml_load_file(ncipcv2::xgatmp);
  }
+private /* gets the data from a URL */
+function get_data($url) {
+  $ch = curl_init();
+  $timeout = 30;
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,0);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+  $data = curl_exec($ch);
+  if(curl_errno($ch)){
+    $cerror = 'CURL Request Error:' . curl_error($ch);
+    if ($this->trace) $this->general('CURL Request Error:' . curl_error($ch));
+    error_log("NCIP error:" . $url . $cerror. "\n", 3, "/tmp/myaccount-ncip-errors.log");
+    curl_close($ch);
+    return false;
+  }
+  curl_close($ch);
+  return $data;
+}
+
 };
