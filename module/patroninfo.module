@@ -7,8 +7,7 @@
 $patroninfo_data;
 
 function _patroninfo_login_page() {
-  // if you go to /myacctpage the permissions will not be right until a refresh
-  $target = url('/myacct', array('alias' => TRUE, 'absolute' => TRUE));
+  $target = url('/myacctpage', array('alias' => TRUE, 'absolute' => TRUE));
 
   if (module_exists('cu_webauth')) {
     $netid = cu_authenticate();
