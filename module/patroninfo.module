@@ -14,7 +14,10 @@ function _patroninfo_login_page() {
   }
   else if (module_exists('simplesamlphp_auth')) {
     $auth = new SimpleSAML_Auth_Simple('default-sp');
-    $auth->requireAuth(array('ReturnTo' => $target));
+    $auth->requireAuth(
+      array('ReturnTo' => $target,
+      //'ReturnCallback' => array('SimpleSAML_Auth_Simple', 'callbackFunction'),
+      ));
   }
   drupal_goto($target);
 }
